@@ -7,7 +7,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/CosmWasm/wasmd/x/wasm/types"
+	"wasmd.mleku.dev/x/wasm/types"
 )
 
 func TestDefaultAuthzPolicyCanCreateCode(t *testing.T) {
@@ -31,12 +31,14 @@ func TestDefaultAuthzPolicyCanCreateCode(t *testing.T) {
 			exp:              true,
 		},
 		"upload any address - included": {
-			chainConfigs:     types.NewChainAccessConfigs(types.AccessTypeAnyOfAddresses.With(otherAddress, myActorAddress), types.AllowEverybody),
+			chainConfigs: types.NewChainAccessConfigs(types.AccessTypeAnyOfAddresses.With(otherAddress, myActorAddress),
+				types.AllowEverybody),
 			contractInstConf: types.AllowEverybody,
 			exp:              true,
 		},
 		"upload any address - not included": {
-			chainConfigs:     types.NewChainAccessConfigs(types.AccessTypeAnyOfAddresses.With(otherAddress), types.AllowEverybody),
+			chainConfigs: types.NewChainAccessConfigs(types.AccessTypeAnyOfAddresses.With(otherAddress),
+				types.AllowEverybody),
 			contractInstConf: types.AllowEverybody,
 			exp:              false,
 		},
@@ -206,11 +208,13 @@ func TestGovAuthzPolicyCanCreateCode(t *testing.T) {
 			contractInstConf: types.AllowEverybody,
 		},
 		"upload any address - included": {
-			chainConfigs:     types.NewChainAccessConfigs(types.AccessTypeAnyOfAddresses.With(otherAddress, myActorAddress), types.AllowEverybody),
+			chainConfigs: types.NewChainAccessConfigs(types.AccessTypeAnyOfAddresses.With(otherAddress, myActorAddress),
+				types.AllowEverybody),
 			contractInstConf: types.AllowEverybody,
 		},
 		"upload any address - not included": {
-			chainConfigs:     types.NewChainAccessConfigs(types.AccessTypeAnyOfAddresses.With(otherAddress), types.AllowEverybody),
+			chainConfigs: types.NewChainAccessConfigs(types.AccessTypeAnyOfAddresses.With(otherAddress),
+				types.AllowEverybody),
 			contractInstConf: types.AllowEverybody,
 		},
 		"contract config -  subtype": {
@@ -431,7 +435,8 @@ var _ types.AuthorizationPolicy = AlwaysRejectTestAuthZPolicy{}
 
 type AlwaysRejectTestAuthZPolicy struct{}
 
-func (a AlwaysRejectTestAuthZPolicy) CanCreateCode(chainConfigs types.ChainAccessConfigs, actor sdk.AccAddress, contractConfig types.AccessConfig) bool {
+func (a AlwaysRejectTestAuthZPolicy) CanCreateCode(chainConfigs types.ChainAccessConfigs, actor sdk.AccAddress,
+	contractConfig types.AccessConfig) bool {
 	return false
 }
 

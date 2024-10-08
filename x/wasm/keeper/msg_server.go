@@ -7,7 +7,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/CosmWasm/wasmd/x/wasm/types"
+	"wasmd.mleku.dev/x/wasm/types"
 )
 
 var _ types.MsgServer = msgServer{}
@@ -46,7 +46,8 @@ func (m msgServer) StoreCode(ctx context.Context, msg *types.MsgStoreCode) (*typ
 }
 
 // InstantiateContract instantiate a new contract with classic sequence based address generation
-func (m msgServer) InstantiateContract(ctx context.Context, msg *types.MsgInstantiateContract) (*types.MsgInstantiateContractResponse, error) {
+func (m msgServer) InstantiateContract(ctx context.Context,
+	msg *types.MsgInstantiateContract) (*types.MsgInstantiateContractResponse, error) {
 	if err := msg.ValidateBasic(); err != nil {
 		return nil, err
 	}
@@ -64,7 +65,8 @@ func (m msgServer) InstantiateContract(ctx context.Context, msg *types.MsgInstan
 
 	policy := m.selectAuthorizationPolicy(ctx, msg.Sender)
 
-	contractAddr, data, err := m.keeper.instantiate(ctx, msg.CodeID, senderAddr, adminAddr, msg.Msg, msg.Label, msg.Funds, m.keeper.ClassicAddressGenerator(), policy)
+	contractAddr, data, err := m.keeper.instantiate(ctx, msg.CodeID, senderAddr, adminAddr, msg.Msg, msg.Label, msg.Funds,
+		m.keeper.ClassicAddressGenerator(), policy)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +78,8 @@ func (m msgServer) InstantiateContract(ctx context.Context, msg *types.MsgInstan
 }
 
 // InstantiateContract2 instantiate a new contract with predicatable address generated
-func (m msgServer) InstantiateContract2(ctx context.Context, msg *types.MsgInstantiateContract2) (*types.MsgInstantiateContract2Response, error) {
+func (m msgServer) InstantiateContract2(ctx context.Context,
+	msg *types.MsgInstantiateContract2) (*types.MsgInstantiateContract2Response, error) {
 	if err := msg.ValidateBasic(); err != nil {
 		return nil, err
 	}
@@ -96,7 +99,8 @@ func (m msgServer) InstantiateContract2(ctx context.Context, msg *types.MsgInsta
 
 	addrGenerator := PredictableAddressGenerator(senderAddr, msg.Salt, msg.Msg, msg.FixMsg)
 
-	contractAddr, data, err := m.keeper.instantiate(ctx, msg.CodeID, senderAddr, adminAddr, msg.Msg, msg.Label, msg.Funds, addrGenerator, policy)
+	contractAddr, data, err := m.keeper.instantiate(ctx, msg.CodeID, senderAddr, adminAddr, msg.Msg, msg.Label, msg.Funds,
+		addrGenerator, policy)
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +111,8 @@ func (m msgServer) InstantiateContract2(ctx context.Context, msg *types.MsgInsta
 	}, nil
 }
 
-func (m msgServer) ExecuteContract(ctx context.Context, msg *types.MsgExecuteContract) (*types.MsgExecuteContractResponse, error) {
+func (m msgServer) ExecuteContract(ctx context.Context, msg *types.MsgExecuteContract) (*types.MsgExecuteContractResponse,
+	error) {
 	if err := msg.ValidateBasic(); err != nil {
 		return nil, err
 	}
@@ -131,7 +136,8 @@ func (m msgServer) ExecuteContract(ctx context.Context, msg *types.MsgExecuteCon
 	}, nil
 }
 
-func (m msgServer) MigrateContract(ctx context.Context, msg *types.MsgMigrateContract) (*types.MsgMigrateContractResponse, error) {
+func (m msgServer) MigrateContract(ctx context.Context, msg *types.MsgMigrateContract) (*types.MsgMigrateContractResponse,
+	error) {
 	if err := msg.ValidateBasic(); err != nil {
 		return nil, err
 	}
@@ -207,7 +213,8 @@ func (m msgServer) ClearAdmin(ctx context.Context, msg *types.MsgClearAdmin) (*t
 	return &types.MsgClearAdminResponse{}, nil
 }
 
-func (m msgServer) UpdateInstantiateConfig(ctx context.Context, msg *types.MsgUpdateInstantiateConfig) (*types.MsgUpdateInstantiateConfigResponse, error) {
+func (m msgServer) UpdateInstantiateConfig(ctx context.Context,
+	msg *types.MsgUpdateInstantiateConfig) (*types.MsgUpdateInstantiateConfigResponse, error) {
 	if err := msg.ValidateBasic(); err != nil {
 		return nil, err
 	}
@@ -306,7 +313,8 @@ func (m msgServer) SudoContract(ctx context.Context, req *types.MsgSudoContract)
 }
 
 // StoreAndInstantiateContract stores and instantiates the contract.
-func (m msgServer) StoreAndInstantiateContract(goCtx context.Context, req *types.MsgStoreAndInstantiateContract) (*types.MsgStoreAndInstantiateContractResponse, error) {
+func (m msgServer) StoreAndInstantiateContract(goCtx context.Context,
+	req *types.MsgStoreAndInstantiateContract) (*types.MsgStoreAndInstantiateContractResponse, error) {
 	if err := req.ValidateBasic(); err != nil {
 		return nil, err
 	}
@@ -331,7 +339,8 @@ func (m msgServer) StoreAndInstantiateContract(goCtx context.Context, req *types
 		return nil, err
 	}
 
-	contractAddr, data, err := m.keeper.instantiate(ctx, codeID, authorityAddr, adminAddr, req.Msg, req.Label, req.Funds, m.keeper.ClassicAddressGenerator(), policy)
+	contractAddr, data, err := m.keeper.instantiate(ctx, codeID, authorityAddr, adminAddr, req.Msg, req.Label, req.Funds,
+		m.keeper.ClassicAddressGenerator(), policy)
 	if err != nil {
 		return nil, err
 	}
@@ -343,7 +352,8 @@ func (m msgServer) StoreAndInstantiateContract(goCtx context.Context, req *types
 }
 
 // AddCodeUploadParamsAddresses adds addresses to code upload params
-func (m msgServer) AddCodeUploadParamsAddresses(goCtx context.Context, req *types.MsgAddCodeUploadParamsAddresses) (*types.MsgAddCodeUploadParamsAddressesResponse, error) {
+func (m msgServer) AddCodeUploadParamsAddresses(goCtx context.Context,
+	req *types.MsgAddCodeUploadParamsAddresses) (*types.MsgAddCodeUploadParamsAddressesResponse, error) {
 	if err := req.ValidateBasic(); err != nil {
 		return nil, err
 	}
@@ -375,7 +385,8 @@ func (m msgServer) AddCodeUploadParamsAddresses(goCtx context.Context, req *type
 }
 
 // RemoveCodeUploadParamsAddresses removes addresses to code upload params
-func (m msgServer) RemoveCodeUploadParamsAddresses(goCtx context.Context, req *types.MsgRemoveCodeUploadParamsAddresses) (*types.MsgRemoveCodeUploadParamsAddressesResponse, error) {
+func (m msgServer) RemoveCodeUploadParamsAddresses(goCtx context.Context,
+	req *types.MsgRemoveCodeUploadParamsAddresses) (*types.MsgRemoveCodeUploadParamsAddressesResponse, error) {
 	if err := req.ValidateBasic(); err != nil {
 		return nil, err
 	}
@@ -428,7 +439,8 @@ func (m msgServer) selectAuthorizationPolicy(ctx context.Context, actor string) 
 }
 
 // StoreAndMigrateContract stores and migrates the contract.
-func (m msgServer) StoreAndMigrateContract(goCtx context.Context, req *types.MsgStoreAndMigrateContract) (*types.MsgStoreAndMigrateContractResponse, error) {
+func (m msgServer) StoreAndMigrateContract(goCtx context.Context,
+	req *types.MsgStoreAndMigrateContract) (*types.MsgStoreAndMigrateContractResponse, error) {
 	authorityAddr, err := sdk.AccAddressFromBech32(req.Authority)
 	if err != nil {
 		return nil, errorsmod.Wrap(err, "authority")
@@ -463,7 +475,8 @@ func (m msgServer) StoreAndMigrateContract(goCtx context.Context, req *types.Msg
 	}, nil
 }
 
-func (m msgServer) UpdateContractLabel(ctx context.Context, msg *types.MsgUpdateContractLabel) (*types.MsgUpdateContractLabelResponse, error) {
+func (m msgServer) UpdateContractLabel(ctx context.Context,
+	msg *types.MsgUpdateContractLabel) (*types.MsgUpdateContractLabelResponse, error) {
 	if err := msg.ValidateBasic(); err != nil {
 		return nil, err
 	}

@@ -18,8 +18,8 @@ import (
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	wasmKeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
-	"github.com/CosmWasm/wasmd/x/wasm/types"
+	wasmKeeper "wasmd.mleku.dev/x/wasm/keeper"
+	"wasmd.mleku.dev/x/wasm/types"
 )
 
 const firstCodeID = 1
@@ -81,7 +81,8 @@ func nextBlock(ctx sdk.Context, stakingKeeper *stakingkeeper.Keeper) sdk.Context
 	return ctx
 }
 
-func setValidatorRewards(ctx sdk.Context, stakingKeeper *stakingkeeper.Keeper, distKeeper distributionkeeper.Keeper, valAddr sdk.ValAddress, reward string) {
+func setValidatorRewards(ctx sdk.Context, stakingKeeper *stakingkeeper.Keeper, distKeeper distributionkeeper.Keeper,
+	valAddr sdk.ValAddress, reward string) {
 	// allocate some rewards
 	vali, err := stakingKeeper.Validator(ctx, valAddr)
 	if err != nil {
@@ -99,7 +100,8 @@ func setValidatorRewards(ctx sdk.Context, stakingKeeper *stakingkeeper.Keeper, d
 }
 
 // adds a few validators and returns a list of validators that are registered
-func addValidator(t *testing.T, ctx sdk.Context, stakingKeeper *stakingkeeper.Keeper, faucet *wasmKeeper.TestFaucet, value sdk.Coin) sdk.ValAddress {
+func addValidator(t *testing.T, ctx sdk.Context, stakingKeeper *stakingkeeper.Keeper, faucet *wasmKeeper.TestFaucet,
+	value sdk.Coin) sdk.ValAddress {
 	owner := faucet.NewFundedRandomAccount(ctx, value)
 
 	privKey := secp256k1.GenPrivKey()

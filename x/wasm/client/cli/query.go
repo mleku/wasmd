@@ -10,15 +10,15 @@ import (
 	"os"
 	"strconv"
 
-	wasmvm "github.com/CosmWasm/wasmvm/v2"
 	"github.com/spf13/cobra"
 	flag "github.com/spf13/pflag"
+	wasmvm "wasm.mleku.dev"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/CosmWasm/wasmd/x/wasm/types"
+	"wasmd.mleku.dev/x/wasm/types"
 )
 
 func GetQueryCmd() *cobra.Command {

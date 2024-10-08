@@ -6,22 +6,22 @@ import (
 	"testing"
 	"time"
 
-	wasmvmtypes "github.com/CosmWasm/wasmvm/v2/types"
 	ibcfee "github.com/cosmos/ibc-go/v8/modules/apps/29-fee/types"
 	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
 	ibctesting "github.com/cosmos/ibc-go/v8/testing"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	wasmvmtypes "wasm.mleku.dev/types"
 
 	sdkmath "cosmossdk.io/math"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/CosmWasm/wasmd/app"
-	"github.com/CosmWasm/wasmd/tests/e2e"
-	wasmibctesting "github.com/CosmWasm/wasmd/tests/ibctesting"
-	"github.com/CosmWasm/wasmd/x/wasm/types"
+	"wasmd.mleku.dev/app"
+	"wasmd.mleku.dev/tests/e2e"
+	wasmibctesting "wasmd.mleku.dev/tests/ibctesting"
+	"wasmd.mleku.dev/x/wasm/types"
 )
 
 func TestIBCCallbacks(t *testing.T) {
@@ -42,14 +42,16 @@ func TestIBCCallbacks(t *testing.T) {
 
 	path := wasmibctesting.NewPath(chainA, chainB)
 	path.EndpointA.ChannelConfig = &ibctesting.ChannelConfig{
-		PortID:  ibctransfertypes.PortID,
-		Version: string(marshaler.MustMarshalJSON(&ibcfee.Metadata{FeeVersion: ibcfee.Version, AppVersion: ibctransfertypes.Version})),
-		Order:   channeltypes.UNORDERED,
+		PortID: ibctransfertypes.PortID,
+		Version: string(marshaler.MustMarshalJSON(&ibcfee.Metadata{FeeVersion: ibcfee.Version,
+			AppVersion: ibctransfertypes.Version})),
+		Order: channeltypes.UNORDERED,
 	}
 	path.EndpointB.ChannelConfig = &ibctesting.ChannelConfig{
-		PortID:  ibctransfertypes.PortID,
-		Version: string(marshaler.MustMarshalJSON(&ibcfee.Metadata{FeeVersion: ibcfee.Version, AppVersion: ibctransfertypes.Version})),
-		Order:   channeltypes.UNORDERED,
+		PortID: ibctransfertypes.PortID,
+		Version: string(marshaler.MustMarshalJSON(&ibcfee.Metadata{FeeVersion: ibcfee.Version,
+			AppVersion: ibctransfertypes.Version})),
+		Order: channeltypes.UNORDERED,
 	}
 	// with an ics-20 transfer channel setup between both chains
 	coord.Setup(path)
@@ -186,14 +188,16 @@ func TestIBCCallbacksWithoutEntrypoints(t *testing.T) {
 
 	path := wasmibctesting.NewPath(chainA, chainB)
 	path.EndpointA.ChannelConfig = &ibctesting.ChannelConfig{
-		PortID:  ibctransfertypes.PortID,
-		Version: string(marshaler.MustMarshalJSON(&ibcfee.Metadata{FeeVersion: ibcfee.Version, AppVersion: ibctransfertypes.Version})),
-		Order:   channeltypes.UNORDERED,
+		PortID: ibctransfertypes.PortID,
+		Version: string(marshaler.MustMarshalJSON(&ibcfee.Metadata{FeeVersion: ibcfee.Version,
+			AppVersion: ibctransfertypes.Version})),
+		Order: channeltypes.UNORDERED,
 	}
 	path.EndpointB.ChannelConfig = &ibctesting.ChannelConfig{
-		PortID:  ibctransfertypes.PortID,
-		Version: string(marshaler.MustMarshalJSON(&ibcfee.Metadata{FeeVersion: ibcfee.Version, AppVersion: ibctransfertypes.Version})),
-		Order:   channeltypes.UNORDERED,
+		PortID: ibctransfertypes.PortID,
+		Version: string(marshaler.MustMarshalJSON(&ibcfee.Metadata{FeeVersion: ibcfee.Version,
+			AppVersion: ibctransfertypes.Version})),
+		Order: channeltypes.UNORDERED,
 	}
 	// with an ics-20 transfer channel setup between both chains
 	coord.Setup(path)
@@ -204,7 +208,8 @@ func TestIBCCallbacksWithoutEntrypoints(t *testing.T) {
 	contractAddrB := e2e.InstantiateReflectContract(t, chainA)
 
 	// when the contract on A sends an IBCMsg::Transfer to the contract on B
-	memo := fmt.Sprintf(`{"src_callback":{"address":"%v"},"dest_callback":{"address":"%v"}}`, contractAddrA.String(), contractAddrB.String())
+	memo := fmt.Sprintf(`{"src_callback":{"address":"%v"},"dest_callback":{"address":"%v"}}`, contractAddrA.String(),
+		contractAddrB.String())
 	e2e.MustExecViaReflectContract(t, chainA, contractAddrA, wasmvmtypes.CosmosMsg{
 		IBC: &wasmvmtypes.IBCMsg{
 			Transfer: &wasmvmtypes.TransferMsg{

@@ -21,7 +21,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/query"
 
-	"github.com/CosmWasm/wasmd/x/wasm/types"
+	"wasmd.mleku.dev/x/wasm/types"
 )
 
 // DefaultGasCostBuildAddress is the SDK gas cost to build a contract address
@@ -37,11 +37,13 @@ type GrpcQuerier struct {
 }
 
 // NewGrpcQuerier constructor
-func NewGrpcQuerier(cdc codec.Codec, storeService corestoretypes.KVStoreService, keeper types.ViewKeeper, queryGasLimit storetypes.Gas) *GrpcQuerier {
+func NewGrpcQuerier(cdc codec.Codec, storeService corestoretypes.KVStoreService, keeper types.ViewKeeper,
+	queryGasLimit storetypes.Gas) *GrpcQuerier {
 	return &GrpcQuerier{cdc: cdc, storeService: storeService, keeper: keeper, queryGasLimit: queryGasLimit}
 }
 
-func (q GrpcQuerier) ContractInfo(c context.Context, req *types.QueryContractInfoRequest) (*types.QueryContractInfoResponse, error) {
+func (q GrpcQuerier) ContractInfo(c context.Context, req *types.QueryContractInfoRequest) (*types.QueryContractInfoResponse,
+	error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
@@ -60,7 +62,8 @@ func (q GrpcQuerier) ContractInfo(c context.Context, req *types.QueryContractInf
 	return rsp, nil
 }
 
-func (q GrpcQuerier) ContractHistory(c context.Context, req *types.QueryContractHistoryRequest) (*types.QueryContractHistoryResponse, error) {
+func (q GrpcQuerier) ContractHistory(c context.Context,
+	req *types.QueryContractHistoryRequest) (*types.QueryContractHistoryResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
@@ -76,17 +79,19 @@ func (q GrpcQuerier) ContractHistory(c context.Context, req *types.QueryContract
 	ctx := sdk.UnwrapSDKContext(c)
 	r := make([]types.ContractCodeHistoryEntry, 0)
 
-	prefixStore := prefix.NewStore(runtime.KVStoreAdapter(q.storeService.OpenKVStore(ctx)), types.GetContractCodeHistoryElementPrefix(contractAddr))
-	pageRes, err := query.FilteredPaginate(prefixStore, paginationParams, func(key, value []byte, accumulate bool) (bool, error) {
-		if accumulate {
-			var e types.ContractCodeHistoryEntry
-			if err := q.cdc.Unmarshal(value, &e); err != nil {
-				return false, err
+	prefixStore := prefix.NewStore(runtime.KVStoreAdapter(q.storeService.OpenKVStore(ctx)),
+		types.GetContractCodeHistoryElementPrefix(contractAddr))
+	pageRes, err := query.FilteredPaginate(prefixStore, paginationParams,
+		func(key, value []byte, accumulate bool) (bool, error) {
+			if accumulate {
+				var e types.ContractCodeHistoryEntry
+				if err := q.cdc.Unmarshal(value, &e); err != nil {
+					return false, err
+				}
+				r = append(r, e)
 			}
-			r = append(r, e)
-		}
-		return true, nil
-	})
+			return true, nil
+		})
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +102,8 @@ func (q GrpcQuerier) ContractHistory(c context.Context, req *types.QueryContract
 }
 
 // ContractsByCode lists all smart contracts for a code id
-func (q GrpcQuerier) ContractsByCode(c context.Context, req *types.QueryContractsByCodeRequest) (*types.QueryContractsByCodeResponse, error) {
+func (q GrpcQuerier) ContractsByCode(c context.Context,
+	req *types.QueryContractsByCodeRequest) (*types.QueryContractsByCodeResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
@@ -112,14 +118,16 @@ func (q GrpcQuerier) ContractsByCode(c context.Context, req *types.QueryContract
 	ctx := sdk.UnwrapSDKContext(c)
 	r := make([]string, 0)
 
-	prefixStore := prefix.NewStore(runtime.KVStoreAdapter(q.storeService.OpenKVStore(ctx)), types.GetContractByCodeIDSecondaryIndexPrefix(req.CodeId))
-	pageRes, err := query.FilteredPaginate(prefixStore, paginationParams, func(key, value []byte, accumulate bool) (bool, error) {
-		if accumulate {
-			var contractAddr sdk.AccAddress = key[types.AbsoluteTxPositionLen:]
-			r = append(r, contractAddr.String())
-		}
-		return true, nil
-	})
+	prefixStore := prefix.NewStore(runtime.KVStoreAdapter(q.storeService.OpenKVStore(ctx)),
+		types.GetContractByCodeIDSecondaryIndexPrefix(req.CodeId))
+	pageRes, err := query.FilteredPaginate(prefixStore, paginationParams,
+		func(key, value []byte, accumulate bool) (bool, error) {
+			if accumulate {
+				var contractAddr sdk.AccAddress = key[types.AbsoluteTxPositionLen:]
+				r = append(r, contractAddr.String())
+			}
+			return true, nil
+		})
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +137,8 @@ func (q GrpcQuerier) ContractsByCode(c context.Context, req *types.QueryContract
 	}, nil
 }
 
-func (q GrpcQuerier) AllContractState(c context.Context, req *types.QueryAllContractStateRequest) (*types.QueryAllContractStateResponse, error) {
+func (q GrpcQuerier) AllContractState(c context.Context,
+	req *types.QueryAllContractStateRequest) (*types.QueryAllContractStateResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
@@ -150,16 +159,18 @@ func (q GrpcQuerier) AllContractState(c context.Context, req *types.QueryAllCont
 	}
 
 	r := make([]types.Model, 0)
-	prefixStore := prefix.NewStore(runtime.KVStoreAdapter(q.storeService.OpenKVStore(ctx)), types.GetContractStorePrefix(contractAddr))
-	pageRes, err := query.FilteredPaginate(prefixStore, paginationParams, func(key, value []byte, accumulate bool) (bool, error) {
-		if accumulate {
-			r = append(r, types.Model{
-				Key:   key,
-				Value: value,
-			})
-		}
-		return true, nil
-	})
+	prefixStore := prefix.NewStore(runtime.KVStoreAdapter(q.storeService.OpenKVStore(ctx)),
+		types.GetContractStorePrefix(contractAddr))
+	pageRes, err := query.FilteredPaginate(prefixStore, paginationParams,
+		func(key, value []byte, accumulate bool) (bool, error) {
+			if accumulate {
+				r = append(r, types.Model{
+					Key:   key,
+					Value: value,
+				})
+			}
+			return true, nil
+		})
 	if err != nil {
 		return nil, err
 	}
@@ -169,7 +180,8 @@ func (q GrpcQuerier) AllContractState(c context.Context, req *types.QueryAllCont
 	}, nil
 }
 
-func (q GrpcQuerier) RawContractState(c context.Context, req *types.QueryRawContractStateRequest) (*types.QueryRawContractStateResponse, error) {
+func (q GrpcQuerier) RawContractState(c context.Context,
+	req *types.QueryRawContractStateRequest) (*types.QueryRawContractStateResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
@@ -188,7 +200,8 @@ func (q GrpcQuerier) RawContractState(c context.Context, req *types.QueryRawCont
 	return &types.QueryRawContractStateResponse{Data: rsp}, nil
 }
 
-func (q GrpcQuerier) SmartContractState(c context.Context, req *types.QuerySmartContractStateRequest) (rsp *types.QuerySmartContractStateResponse, err error) {
+func (q GrpcQuerier) SmartContractState(c context.Context,
+	req *types.QuerySmartContractStateRequest) (rsp *types.QuerySmartContractStateResponse, err error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
@@ -264,21 +277,22 @@ func (q GrpcQuerier) Codes(c context.Context, req *types.QueryCodesRequest) (*ty
 	ctx := sdk.UnwrapSDKContext(c)
 	r := make([]types.CodeInfoResponse, 0)
 	prefixStore := prefix.NewStore(runtime.KVStoreAdapter(q.storeService.OpenKVStore(ctx)), types.CodeKeyPrefix)
-	pageRes, err := query.FilteredPaginate(prefixStore, paginationParams, func(key, value []byte, accumulate bool) (bool, error) {
-		if accumulate {
-			var c types.CodeInfo
-			if err := q.cdc.Unmarshal(value, &c); err != nil {
-				return false, err
+	pageRes, err := query.FilteredPaginate(prefixStore, paginationParams,
+		func(key, value []byte, accumulate bool) (bool, error) {
+			if accumulate {
+				var c types.CodeInfo
+				if err := q.cdc.Unmarshal(value, &c); err != nil {
+					return false, err
+				}
+				r = append(r, types.CodeInfoResponse{
+					CodeID:                binary.BigEndian.Uint64(key),
+					Creator:               c.Creator,
+					DataHash:              c.CodeHash,
+					InstantiatePermission: c.InstantiateConfig,
+				})
 			}
-			r = append(r, types.CodeInfoResponse{
-				CodeID:                binary.BigEndian.Uint64(key),
-				Creator:               c.Creator,
-				DataHash:              c.CodeHash,
-				InstantiatePermission: c.InstantiateConfig,
-			})
-		}
-		return true, nil
-	})
+			return true, nil
+		})
 	if err != nil {
 		return nil, err
 	}
@@ -304,7 +318,8 @@ func (q GrpcQuerier) CodeInfo(c context.Context, req *types.QueryCodeInfoRequest
 	}, nil
 }
 
-func queryContractInfo(ctx sdk.Context, addr sdk.AccAddress, keeper types.ViewKeeper) (*types.QueryContractInfoResponse, error) {
+func queryContractInfo(ctx sdk.Context, addr sdk.AccAddress, keeper types.ViewKeeper) (*types.QueryContractInfoResponse,
+	error) {
 	info := keeper.GetContractInfo(ctx, addr)
 	if info == nil {
 		return nil, types.ErrNoSuchContractFn(addr.String()).
@@ -348,7 +363,8 @@ func queryCodeInfo(ctx sdk.Context, codeID uint64, keeper types.ViewKeeper) *typ
 	return &info
 }
 
-func (q GrpcQuerier) PinnedCodes(c context.Context, req *types.QueryPinnedCodesRequest) (*types.QueryPinnedCodesResponse, error) {
+func (q GrpcQuerier) PinnedCodes(c context.Context, req *types.QueryPinnedCodesRequest) (*types.QueryPinnedCodesResponse,
+	error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
@@ -383,7 +399,8 @@ func (q GrpcQuerier) Params(c context.Context, _ *types.QueryParamsRequest) (*ty
 	return &types.QueryParamsResponse{Params: params}, nil
 }
 
-func (q GrpcQuerier) ContractsByCreator(c context.Context, req *types.QueryContractsByCreatorRequest) (*types.QueryContractsByCreatorResponse, error) {
+func (q GrpcQuerier) ContractsByCreator(c context.Context,
+	req *types.QueryContractsByCreatorRequest) (*types.QueryContractsByCreatorResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
@@ -399,7 +416,8 @@ func (q GrpcQuerier) ContractsByCreator(c context.Context, req *types.QueryContr
 	if err != nil {
 		return nil, err
 	}
-	prefixStore := prefix.NewStore(runtime.KVStoreAdapter(q.storeService.OpenKVStore(ctx)), types.GetContractsByCreatorPrefix(creatorAddress))
+	prefixStore := prefix.NewStore(runtime.KVStoreAdapter(q.storeService.OpenKVStore(ctx)),
+		types.GetContractsByCreatorPrefix(creatorAddress))
 	pageRes, err := query.FilteredPaginate(prefixStore, paginationParams, func(key, _ []byte, accumulate bool) (bool, error) {
 		if accumulate {
 			accAddres := sdk.AccAddress(key[types.AbsoluteTxPositionLen:])
@@ -439,7 +457,8 @@ func ensurePaginationParams(req *query.PageRequest) (*query.PageRequest, error) 
 	return req, nil
 }
 
-func (q GrpcQuerier) BuildAddress(c context.Context, req *types.QueryBuildAddressRequest) (*types.QueryBuildAddressResponse, error) {
+func (q GrpcQuerier) BuildAddress(c context.Context, req *types.QueryBuildAddressRequest) (*types.QueryBuildAddressResponse,
+	error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}

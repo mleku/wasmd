@@ -45,8 +45,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/staking/testutil"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	"github.com/CosmWasm/wasmd/app"
-	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
+	"wasmd.mleku.dev/app"
+	wasmkeeper "wasmd.mleku.dev/x/wasm/keeper"
 )
 
 var MaxAccounts = 10
@@ -118,10 +118,12 @@ type PacketAck struct {
 }
 
 // ChainAppFactory abstract factory method that usually implemented by app.SetupWithGenesisValSet
-type ChainAppFactory func(t *testing.T, valSet *cmttypes.ValidatorSet, genAccs []authtypes.GenesisAccount, chainID string, opts []wasmkeeper.Option, balances ...banktypes.Balance) ChainApp
+type ChainAppFactory func(t *testing.T, valSet *cmttypes.ValidatorSet, genAccs []authtypes.GenesisAccount, chainID string,
+	opts []wasmkeeper.Option, balances ...banktypes.Balance) ChainApp
 
 // DefaultWasmAppFactory instantiates and sets up the default wasmd app
-func DefaultWasmAppFactory(t *testing.T, valSet *cmttypes.ValidatorSet, genAccs []authtypes.GenesisAccount, chainID string, opts []wasmkeeper.Option, balances ...banktypes.Balance) ChainApp {
+func DefaultWasmAppFactory(t *testing.T, valSet *cmttypes.ValidatorSet, genAccs []authtypes.GenesisAccount, chainID string,
+	opts []wasmkeeper.Option, balances ...banktypes.Balance) ChainApp {
 	return app.SetupWithGenesisValSet(t, valSet, genAccs, chainID, opts, balances...)
 }
 
@@ -133,7 +135,8 @@ func NewDefaultTestChain(t *testing.T, coord *Coordinator, chainID string, opts 
 
 // NewTestChain initializes a new test chain with a default of 4 validators
 // Use this function if the tests do not need custom control over the validator set
-func NewTestChain(t *testing.T, coord *Coordinator, appFactory ChainAppFactory, chainID string, opts ...wasmkeeper.Option) *TestChain {
+func NewTestChain(t *testing.T, coord *Coordinator, appFactory ChainAppFactory, chainID string,
+	opts ...wasmkeeper.Option) *TestChain {
 	// generate validators private/public key
 	var (
 		validatorsPerChain = 4
@@ -172,7 +175,8 @@ func NewTestChain(t *testing.T, coord *Coordinator, appFactory ChainAppFactory, 
 //
 // CONTRACT: Validator array must be provided in the order expected by Tendermint.
 // i.e. sorted first by power and then lexicographically by address.
-func NewTestChainWithValSet(t *testing.T, coord *Coordinator, appFactory ChainAppFactory, chainID string, valSet *cmttypes.ValidatorSet, signers map[string]cmttypes.PrivValidator, opts ...wasmkeeper.Option) *TestChain {
+func NewTestChainWithValSet(t *testing.T, coord *Coordinator, appFactory ChainAppFactory, chainID string,
+	valSet *cmttypes.ValidatorSet, signers map[string]cmttypes.PrivValidator, opts ...wasmkeeper.Option) *TestChain {
 	genAccs := []authtypes.GenesisAccount{}
 	genBals := []banktypes.Balance{}
 	senderAccs := []SenderAccount{}
@@ -375,7 +379,8 @@ func (chain *TestChain) SendMsgs(msgs ...sdk.Msg) (*abci.ExecTxResult, error) {
 }
 
 // SendNonDefaultSenderMsgs is the same as SendMsgs but with a custom signer/account
-func (chain *TestChain) SendNonDefaultSenderMsgs(senderPrivKey cryptotypes.PrivKey, msgs ...sdk.Msg) (*abci.ExecTxResult, error) {
+func (chain *TestChain) SendNonDefaultSenderMsgs(senderPrivKey cryptotypes.PrivKey, msgs ...sdk.Msg) (*abci.ExecTxResult,
+	error) {
 	require.NotEqual(chain.t, chain.SenderPrivKey, senderPrivKey, "use SendMsgs method")
 
 	addr := sdk.AccAddress(senderPrivKey.PubKey().Address().Bytes())
@@ -474,7 +479,8 @@ func (chain *TestChain) GetValsAtHeight(height int64) (*cmttypes.ValidatorSet, b
 // GetAcknowledgement retrieves an acknowledgement for the provided packet. If the
 // acknowledgement does not exist then testing will fail.
 func (chain *TestChain) GetAcknowledgement(packet exported.PacketI) []byte {
-	ack, found := chain.App.GetIBCKeeper().ChannelKeeper.GetPacketAcknowledgement(chain.GetContext(), packet.GetDestPort(), packet.GetDestChannel(), packet.GetSequence())
+	ack, found := chain.App.GetIBCKeeper().ChannelKeeper.GetPacketAcknowledgement(chain.GetContext(), packet.GetDestPort(),
+		packet.GetDestChannel(), packet.GetSequence())
 	require.True(chain.t, found)
 
 	return ack
@@ -493,7 +499,8 @@ func (chain *TestChain) ConstructUpdateTMClientHeader(counterparty *TestChain, c
 
 // ConstructUpdateCMTClientHeaderWithTrustedHeight will construct a valid 07-tendermint Header to update the
 // light client on the source chain.
-func (chain *TestChain) ConstructUpdateCMTClientHeaderWithTrustedHeight(counterparty *TestChain, clientID string, trustedHeight clienttypes.Height) (*ibctm.Header, error) {
+func (chain *TestChain) ConstructUpdateCMTClientHeaderWithTrustedHeight(counterparty *TestChain, clientID string,
+	trustedHeight clienttypes.Height) (*ibctm.Header, error) {
 	header := counterparty.LastHeader
 	// Relayer must query for LatestHeight on client to get TrustedHeight if the trusted height is not set
 	if trustedHeight.IsZero() {
@@ -515,7 +522,8 @@ func (chain *TestChain) ConstructUpdateCMTClientHeaderWithTrustedHeight(counterp
 		// NextValidatorsHash
 		cmtTrustedVals, ok = counterparty.GetValsAtHeight(int64(trustedHeight.RevisionHeight + 1))
 		if !ok {
-			return nil, errorsmod.Wrapf(ibctm.ErrInvalidHeaderHeight, "could not retrieve trusted validators at trustedHeight: %d", trustedHeight)
+			return nil, errorsmod.Wrapf(ibctm.ErrInvalidHeaderHeight,
+				"could not retrieve trusted validators at trustedHeight: %d", trustedHeight)
 		}
 	}
 	// inject trusted fields into last header
@@ -554,7 +562,9 @@ func (chain *TestChain) CurrentCmtClientHeader() *ibctm.Header {
 
 // CreateCmtClientHeader creates a CMT header to update the CMT client. Args are passed in to allow
 // caller flexibility to use params that differ from the chain.
-func (chain *TestChain) CreateCmtClientHeader(chainID string, blockHeight int64, trustedHeight clienttypes.Height, timestamp time.Time, cmtValSet, nextVals, cmtTrustedVals *cmttypes.ValidatorSet, signers map[string]cmttypes.PrivValidator) *ibctm.Header {
+func (chain *TestChain) CreateCmtClientHeader(chainID string, blockHeight int64, trustedHeight clienttypes.Height,
+	timestamp time.Time, cmtValSet, nextVals, cmtTrustedVals *cmttypes.ValidatorSet,
+	signers map[string]cmttypes.PrivValidator) *ibctm.Header {
 	var (
 		valSet      *cmtproto.ValidatorSet
 		trustedVals *cmtproto.ValidatorSet
@@ -679,7 +689,8 @@ func (chain *TestChain) CreateChannelCapability(scopedKeeper capabilitykeeper.Sc
 // GetChannelCapability returns the channel capability for the given portID and channelID.
 // The capability must exist, otherwise testing will fail.
 func (chain *TestChain) GetChannelCapability(portID, channelID string) *capabilitytypes.Capability {
-	chanCap, ok := chain.App.GetScopedIBCKeeper().GetCapability(chain.GetContext(), host.ChannelCapabilityPath(portID, channelID))
+	chanCap, ok := chain.App.GetScopedIBCKeeper().GetCapability(chain.GetContext(),
+		host.ChannelCapabilityPath(portID, channelID))
 	require.True(chain.t, ok)
 
 	return chanCap

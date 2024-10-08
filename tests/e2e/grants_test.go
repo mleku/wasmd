@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	wasmvm "github.com/CosmWasm/wasmvm/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	wasmvm "wasm.mleku.dev"
 
 	errorsmod "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
@@ -19,9 +19,9 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/authz"
 
-	"github.com/CosmWasm/wasmd/tests/e2e"
-	"github.com/CosmWasm/wasmd/tests/ibctesting"
-	"github.com/CosmWasm/wasmd/x/wasm/types"
+	"wasmd.mleku.dev/tests/e2e"
+	"wasmd.mleku.dev/tests/ibctesting"
+	"wasmd.mleku.dev/x/wasm/types"
 )
 
 func TestGrants(t *testing.T) {
@@ -100,7 +100,8 @@ func TestGrants(t *testing.T) {
 			granterStartBalance := chain.Balance(granterAddr, sdk.DefaultBondDenom).Amount
 
 			// when
-			anyValidReflectMsg := []byte(fmt.Sprintf(`{"reflect_msg": {"msgs": [{"bank":{"burn":{"amount":[{"denom":%q, "amount": %q}]}}}]}}`, sdk.DefaultBondDenom, myAmount.Amount.String()))
+			anyValidReflectMsg := []byte(fmt.Sprintf(`{"reflect_msg": {"msgs": [{"bank":{"burn":{"amount":[{"denom":%q, "amount": %q}]}}}]}}`,
+				sdk.DefaultBondDenom, myAmount.Amount.String()))
 			execMsg := authz.NewMsgExec(spec.senderKey.PubKey().Address().Bytes(), []sdk.Msg{&types.MsgExecuteContract{
 				Sender:   granterAddr.String(),
 				Contract: contractAddr.String(),
@@ -118,7 +119,8 @@ func TestGrants(t *testing.T) {
 			}
 			require.NoError(t, gotErr)
 			assert.Equal(t, sdkmath.NewInt(1_000_000), chain.Balance(granteeAddr, sdk.DefaultBondDenom).Amount)
-			assert.Equal(t, granterStartBalance.Sub(spec.transferAmount.Amount), chain.Balance(granterAddr, sdk.DefaultBondDenom).Amount)
+			assert.Equal(t, granterStartBalance.Sub(spec.transferAmount.Amount),
+				chain.Balance(granterAddr, sdk.DefaultBondDenom).Amount)
 		})
 	}
 }

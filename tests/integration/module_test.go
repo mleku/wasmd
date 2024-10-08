@@ -24,12 +24,12 @@ import (
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 
-	"github.com/CosmWasm/wasmd/x/wasm"
-	"github.com/CosmWasm/wasmd/x/wasm/exported"
-	"github.com/CosmWasm/wasmd/x/wasm/keeper"
-	"github.com/CosmWasm/wasmd/x/wasm/keeper/testdata"
-	v2 "github.com/CosmWasm/wasmd/x/wasm/migrations/v2"
-	"github.com/CosmWasm/wasmd/x/wasm/types"
+	"wasmd.mleku.dev/x/wasm"
+	"wasmd.mleku.dev/x/wasm/exported"
+	"wasmd.mleku.dev/x/wasm/keeper"
+	"wasmd.mleku.dev/x/wasm/keeper/testdata"
+	v2 "wasmd.mleku.dev/x/wasm/migrations/v2"
+	"wasmd.mleku.dev/x/wasm/types"
 )
 
 type mockSubspace struct {
@@ -74,7 +74,8 @@ func setupTest(t *testing.T) testData {
 	queryRouter.SetInterfaceRegistry(encConf.InterfaceRegistry)
 	serviceRouter.SetInterfaceRegistry(encConf.InterfaceRegistry)
 	data := testData{
-		module:           wasm.NewAppModule(encConf.Codec, keepers.WasmKeeper, keepers.StakingKeeper, keepers.AccountKeeper, keepers.BankKeeper, nil, newMockSubspace(DefaultParams)),
+		module: wasm.NewAppModule(encConf.Codec, keepers.WasmKeeper, keepers.StakingKeeper, keepers.AccountKeeper,
+			keepers.BankKeeper, nil, newMockSubspace(DefaultParams)),
 		ctx:              ctx,
 		acctKeeper:       keepers.AccountKeeper,
 		keeper:           *keepers.WasmKeeper,
@@ -581,7 +582,8 @@ func assertCodeList(t *testing.T, q *baseapp.GRPCQueryRouter, ctx sdk.Context, e
 	assert.Equal(t, expectedNum, len(res.CodeInfos))
 }
 
-func assertCodeBytes(t *testing.T, q *baseapp.GRPCQueryRouter, ctx sdk.Context, codeID uint64, expectedBytes []byte, marshaler codec.Codec) {
+func assertCodeBytes(t *testing.T, q *baseapp.GRPCQueryRouter, ctx sdk.Context, codeID uint64, expectedBytes []byte,
+	marshaler codec.Codec) {
 	t.Helper()
 	bz, err := marshaler.Marshal(&types.QueryCodeRequest{CodeId: codeID})
 	require.NoError(t, err)
@@ -601,7 +603,8 @@ func assertCodeBytes(t *testing.T, q *baseapp.GRPCQueryRouter, ctx sdk.Context, 
 	assert.Equal(t, expectedBytes, rsp.Data)
 }
 
-func assertContractList(t *testing.T, q *baseapp.GRPCQueryRouter, ctx sdk.Context, codeID uint64, expContractAddrs []string, marshaler codec.Codec) {
+func assertContractList(t *testing.T, q *baseapp.GRPCQueryRouter, ctx sdk.Context, codeID uint64, expContractAddrs []string,
+	marshaler codec.Codec) {
 	t.Helper()
 	bz, err := marshaler.Marshal(&types.QueryContractsByCodeRequest{CodeId: codeID})
 	require.NoError(t, err)
@@ -626,7 +629,8 @@ func assertContractList(t *testing.T, q *baseapp.GRPCQueryRouter, ctx sdk.Contex
 	assert.Equal(t, expContractAddrs, hasAddrs)
 }
 
-func assertContractState(t *testing.T, q *baseapp.GRPCQueryRouter, ctx sdk.Context, contractBech32Addr string, expected state, marshaler codec.Codec) {
+func assertContractState(t *testing.T, q *baseapp.GRPCQueryRouter, ctx sdk.Context, contractBech32Addr string, expected state,
+	marshaler codec.Codec) {
 	t.Helper()
 	bz, err := marshaler.Marshal(&types.QueryRawContractStateRequest{Address: contractBech32Addr, QueryData: []byte("config")})
 	require.NoError(t, err)
@@ -644,7 +648,8 @@ func assertContractState(t *testing.T, q *baseapp.GRPCQueryRouter, ctx sdk.Conte
 	assert.Equal(t, expectedBz, rsp.Data)
 }
 
-func assertContractInfo(t *testing.T, q *baseapp.GRPCQueryRouter, ctx sdk.Context, contractBech32Addr string, codeID uint64, creator sdk.AccAddress, marshaler codec.Codec) {
+func assertContractInfo(t *testing.T, q *baseapp.GRPCQueryRouter, ctx sdk.Context, contractBech32Addr string, codeID uint64,
+	creator sdk.AccAddress, marshaler codec.Codec) {
 	t.Helper()
 	bz, err := marshaler.Marshal(&types.QueryContractInfoRequest{Address: contractBech32Addr})
 	require.NoError(t, err)

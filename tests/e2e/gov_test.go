@@ -4,9 +4,9 @@ import (
 	"testing"
 	"time"
 
-	wasmvmtypes "github.com/CosmWasm/wasmvm/v2/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	wasmvmtypes "wasm.mleku.dev/types"
 
 	sdkmath "cosmossdk.io/math"
 
@@ -15,9 +15,9 @@ import (
 	distributiontypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	v1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 
-	"github.com/CosmWasm/wasmd/app"
-	"github.com/CosmWasm/wasmd/tests/e2e"
-	"github.com/CosmWasm/wasmd/tests/ibctesting"
+	"wasmd.mleku.dev/app"
+	"wasmd.mleku.dev/tests/e2e"
+	"wasmd.mleku.dev/tests/ibctesting"
 )
 
 func TestGovVoteByContract(t *testing.T) {
@@ -47,7 +47,8 @@ func TestGovVoteByContract(t *testing.T) {
 	signer := chain.SenderAccount.GetAddress().String()
 	app := chain.App.(*app.WasmApp)
 	govKeeper, accountKeeper := app.GovKeeper, app.AccountKeeper
-	communityPoolBalance := chain.Balance(accountKeeper.GetModuleAccount(chain.GetContext(), distributiontypes.ModuleName).GetAddress(), sdk.DefaultBondDenom)
+	communityPoolBalance := chain.Balance(accountKeeper.GetModuleAccount(chain.GetContext(),
+		distributiontypes.ModuleName).GetAddress(), sdk.DefaultBondDenom)
 	require.False(t, communityPoolBalance.IsZero())
 
 	gParams, err := govKeeper.Params.Get(chain.GetContext())

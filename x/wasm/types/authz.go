@@ -5,8 +5,8 @@ import (
 	"context"
 	"strings"
 
-	wasmvm "github.com/CosmWasm/wasmvm/v2"
 	"github.com/cosmos/gogoproto/proto"
+	wasmvm "wasm.mleku.dev"
 
 	errorsmod "cosmossdk.io/errors"
 
@@ -15,7 +15,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authztypes "github.com/cosmos/cosmos-sdk/x/authz"
 
-	"github.com/CosmWasm/wasmd/x/wasm/ioutils"
+	"wasmd.mleku.dev/x/wasm/ioutils"
 )
 
 const (
@@ -242,7 +242,8 @@ type ContractAuthzFactory interface {
 
 // AcceptGrantedMessage determines whether this grant permits the provided sdk.Msg to be performed,
 // and if so provides an upgraded authorization instance.
-func AcceptGrantedMessage[T AuthzableWasmMsg](ctx sdk.Context, grants []ContractGrant, msg sdk.Msg, factory ContractAuthzFactory) (authztypes.AcceptResponse, error) {
+func AcceptGrantedMessage[T AuthzableWasmMsg](ctx sdk.Context, grants []ContractGrant, msg sdk.Msg,
+	factory ContractAuthzFactory) (authztypes.AcceptResponse, error) {
 	exec, ok := msg.(T)
 	if !ok {
 		return authztypes.AcceptResponse{}, sdkerrors.ErrInvalidType.Wrap("type mismatch")

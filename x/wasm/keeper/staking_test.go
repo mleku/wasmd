@@ -5,9 +5,9 @@ import (
 	"os"
 	"testing"
 
-	wasmvmtypes "github.com/CosmWasm/wasmvm/v2/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	wasmvmtypes "wasm.mleku.dev/types"
 
 	sdkmath "cosmossdk.io/math"
 
@@ -20,8 +20,8 @@ import (
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	"github.com/CosmWasm/wasmd/x/wasm/keeper/testdata"
-	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+	"wasmd.mleku.dev/x/wasm/keeper/testdata"
+	wasmtypes "wasmd.mleku.dev/x/wasm/types"
 )
 
 type StakingInitMsg struct {
@@ -663,7 +663,8 @@ func TestQueryStakingPlugin(t *testing.T) {
 }
 
 // adds a few validators and returns a list of validators that are registered
-func addValidator(t *testing.T, ctx sdk.Context, stakingKeeper *stakingkeeper.Keeper, faucet *TestFaucet, value sdk.Coin) sdk.ValAddress {
+func addValidator(t *testing.T, ctx sdk.Context, stakingKeeper *stakingkeeper.Keeper, faucet *TestFaucet,
+	value sdk.Coin) sdk.ValAddress {
 	owner := faucet.NewFundedRandomAccount(ctx, value)
 
 	privKey := secp256k1.GenPrivKey()
@@ -703,7 +704,8 @@ func nextBlock(ctx sdk.Context, stakingKeeper *stakingkeeper.Keeper) sdk.Context
 	return ctx
 }
 
-func setValidatorRewards(ctx sdk.Context, stakingKeeper *stakingkeeper.Keeper, distKeeper distributionkeeper.Keeper, valAddr sdk.ValAddress, reward string) {
+func setValidatorRewards(ctx sdk.Context, stakingKeeper *stakingkeeper.Keeper, distKeeper distributionkeeper.Keeper,
+	valAddr sdk.ValAddress, reward string) {
 	// allocate some rewards
 	vali, err := stakingKeeper.Validator(ctx, valAddr)
 	if err != nil {
@@ -752,7 +754,8 @@ func assertClaims(t *testing.T, ctx sdk.Context, keeper Keeper, contract, addr s
 	assert.Equal(t, expected, claims.Claims)
 }
 
-func assertSupply(t *testing.T, ctx sdk.Context, keeper Keeper, contract sdk.AccAddress, expectedIssued string, expectedBonded sdk.Coin) {
+func assertSupply(t *testing.T, ctx sdk.Context, keeper Keeper, contract sdk.AccAddress, expectedIssued string,
+	expectedBonded sdk.Coin) {
 	query := StakingQueryMsg{Investment: &struct{}{}}
 	queryBz, err := json.Marshal(query)
 	require.NoError(t, err)

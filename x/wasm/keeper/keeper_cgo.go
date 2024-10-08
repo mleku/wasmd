@@ -5,14 +5,14 @@ package keeper
 import (
 	"path/filepath"
 
-	wasmvm "github.com/CosmWasm/wasmvm/v2"
+	wasmvm "wasm.mleku.dev"
 
 	"cosmossdk.io/collections"
 	corestoretypes "cosmossdk.io/core/store"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 
-	"github.com/CosmWasm/wasmd/x/wasm/types"
+	"wasmd.mleku.dev/x/wasm/types"
 )
 
 // NewKeeper creates a new contract Keeper instance
@@ -58,7 +58,8 @@ func NewKeeper(
 		},
 		authority: authority,
 	}
-	keeper.messenger = NewDefaultMessageHandler(keeper, router, ics4Wrapper, channelKeeper, capabilityKeeper, bankKeeper, cdc, portSource)
+	keeper.messenger = NewDefaultMessageHandler(keeper, router, ics4Wrapper, channelKeeper, capabilityKeeper, bankKeeper, cdc,
+		portSource)
 	keeper.wasmVMQueryHandler = DefaultQueryPlugins(bankKeeper, stakingKeeper, distrKeeper, channelKeeper, keeper)
 	preOpts, postOpts := splitOpts(opts)
 	for _, o := range preOpts {
@@ -70,7 +71,8 @@ func NewKeeper(
 	// NewVM does a lot, so better not to create it and silently drop it.
 	if keeper.wasmVM == nil {
 		var err error
-		keeper.wasmVM, err = wasmvm.NewVM(filepath.Join(homeDir, "wasm"), availableCapabilities, contractMemoryLimit, wasmConfig.ContractDebugMode, wasmConfig.MemoryCacheSize)
+		keeper.wasmVM, err = wasmvm.NewVM(filepath.Join(homeDir, "wasm"), availableCapabilities, contractMemoryLimit,
+			wasmConfig.ContractDebugMode, wasmConfig.MemoryCacheSize)
 		if err != nil {
 			panic(err)
 		}

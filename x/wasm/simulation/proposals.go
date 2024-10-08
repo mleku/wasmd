@@ -7,8 +7,8 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 
-	"github.com/CosmWasm/wasmd/x/wasm/keeper/testdata"
-	"github.com/CosmWasm/wasmd/x/wasm/types"
+	"wasmd.mleku.dev/x/wasm/keeper/testdata"
+	"wasmd.mleku.dev/x/wasm/types"
 )
 
 const (
@@ -133,7 +133,8 @@ func SimulateStoreCodeProposal(wasmKeeper WasmKeeper) simtypes.MsgSimulatorFn {
 }
 
 // Simulate instantiate contract proposal
-func SimulateInstantiateContractProposal(bk BankKeeper, wasmKeeper WasmKeeper, codeSelector CodeIDSelector) simtypes.MsgSimulatorFn {
+func SimulateInstantiateContractProposal(bk BankKeeper, wasmKeeper WasmKeeper,
+	codeSelector CodeIDSelector) simtypes.MsgSimulatorFn {
 	return func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
 		authority := wasmKeeper.GetAuthority()
 
@@ -257,7 +258,8 @@ func SimulateClearAdminProposal(wasmKeeper WasmKeeper, contractSelector ClearAdm
 type MigrateContractProposalContractSelector func(sdk.Context, WasmKeeper) sdk.AccAddress
 
 // Simulate migrate contract proposal
-func SimulateMigrateContractProposal(wasmKeeper WasmKeeper, contractSelector MigrateContractProposalContractSelector, codeSelector CodeIDSelector) simtypes.MsgSimulatorFn {
+func SimulateMigrateContractProposal(wasmKeeper WasmKeeper, contractSelector MigrateContractProposalContractSelector,
+	codeSelector CodeIDSelector) simtypes.MsgSimulatorFn {
 	return func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
 		authority := wasmKeeper.GetAuthority()
 
@@ -283,7 +285,8 @@ func SimulateMigrateContractProposal(wasmKeeper WasmKeeper, contractSelector Mig
 type SudoContractProposalContractSelector func(sdk.Context, WasmKeeper) sdk.AccAddress
 
 // Simulate sudo contract proposal
-func SimulateSudoContractProposal(wasmKeeper WasmKeeper, contractSelector SudoContractProposalContractSelector) simtypes.MsgSimulatorFn {
+func SimulateSudoContractProposal(wasmKeeper WasmKeeper,
+	contractSelector SudoContractProposalContractSelector) simtypes.MsgSimulatorFn {
 	return func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
 		authority := wasmKeeper.GetAuthority()
 

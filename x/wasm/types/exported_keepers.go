@@ -3,10 +3,10 @@ package types
 import (
 	"context"
 
-	wasmvmtypes "github.com/CosmWasm/wasmvm/v2/types"
 	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
 	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
 	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
+	wasmvmtypes "wasm.mleku.dev/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -32,7 +32,8 @@ type ViewKeeper interface {
 // ContractOpsKeeper contains mutable operations on a contract.
 type ContractOpsKeeper interface {
 	// Create uploads and compiles a WASM contract, returning a short identifier for the contract
-	Create(ctx sdk.Context, creator sdk.AccAddress, wasmCode []byte, instantiateAccess *AccessConfig) (codeID uint64, checksum []byte, err error)
+	Create(ctx sdk.Context, creator sdk.AccAddress, wasmCode []byte, instantiateAccess *AccessConfig) (codeID uint64,
+		checksum []byte, err error)
 
 	// Instantiate creates an instance of a WASM contract using the classic sequence based address generator
 	Instantiate(

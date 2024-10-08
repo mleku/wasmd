@@ -10,13 +10,13 @@ import (
 	"testing"
 	"time"
 
-	wasmvmtypes "github.com/CosmWasm/wasmvm/v2/types"
 	"github.com/cometbft/cometbft/crypto/ed25519"
 	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/cosmos/gogoproto/proto"
 	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	wasmvmtypes "wasm.mleku.dev/types"
 
 	errorsmod "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
@@ -29,16 +29,17 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	"github.com/CosmWasm/wasmd/app"
-	"github.com/CosmWasm/wasmd/x/wasm/keeper"
-	wasmKeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
-	"github.com/CosmWasm/wasmd/x/wasm/keeper/testdata"
-	"github.com/CosmWasm/wasmd/x/wasm/types"
+	"wasmd.mleku.dev/app"
+	"wasmd.mleku.dev/x/wasm/keeper"
+	wasmKeeper "wasmd.mleku.dev/x/wasm/keeper"
+	"wasmd.mleku.dev/x/wasm/keeper/testdata"
+	"wasmd.mleku.dev/x/wasm/types"
 )
 
 func TestMaskReflectCustomQuery(t *testing.T) {
 	cdc := wasmKeeper.MakeEncodingConfig(t).Codec
-	ctx, keepers := wasmKeeper.CreateTestInput(t, false, ReflectCapabilities, wasmKeeper.WithMessageEncoders(reflectEncoders(cdc)), wasmKeeper.WithQueryPlugins(reflectPlugins()))
+	ctx, keepers := wasmKeeper.CreateTestInput(t, false, ReflectCapabilities,
+		wasmKeeper.WithMessageEncoders(reflectEncoders(cdc)), wasmKeeper.WithQueryPlugins(reflectPlugins()))
 	keeper := keepers.WasmKeeper
 
 	deposit := sdk.NewCoins(sdk.NewInt64Coin("denom", 100000))
@@ -51,7 +52,8 @@ func TestMaskReflectCustomQuery(t *testing.T) {
 
 	// creator instantiates a contract and gives it tokens
 	contractStart := sdk.NewCoins(sdk.NewInt64Coin("denom", 40000))
-	contractAddr, _, err := keepers.ContractKeeper.Instantiate(ctx, codeID, creator, nil, []byte("{}"), "reflect contract 1", contractStart)
+	contractAddr, _, err := keepers.ContractKeeper.Instantiate(ctx, codeID, creator, nil, []byte("{}"), "reflect contract 1",
+		contractStart)
 	require.NoError(t, err)
 	require.NotEmpty(t, contractAddr)
 
@@ -86,7 +88,8 @@ func TestMaskReflectCustomQuery(t *testing.T) {
 
 func TestReflectStargateQuery(t *testing.T) {
 	cdc := wasmKeeper.MakeEncodingConfig(t).Codec
-	ctx, keepers := wasmKeeper.CreateTestInput(t, false, ReflectCapabilities, wasmKeeper.WithMessageEncoders(reflectEncoders(cdc)), wasmKeeper.WithQueryPlugins(reflectPlugins()))
+	ctx, keepers := wasmKeeper.CreateTestInput(t, false, ReflectCapabilities,
+		wasmKeeper.WithMessageEncoders(reflectEncoders(cdc)), wasmKeeper.WithQueryPlugins(reflectPlugins()))
 	keeper := keepers.WasmKeeper
 
 	funds := sdk.NewCoins(sdk.NewInt64Coin("denom", 320000))
@@ -100,7 +103,8 @@ func TestReflectStargateQuery(t *testing.T) {
 	require.Equal(t, uint64(1), codeID)
 
 	// creator instantiates a contract and gives it tokens
-	contractAddr, _, err := keepers.ContractKeeper.Instantiate(ctx, codeID, creator, nil, []byte("{}"), "reflect contract 1", contractStart)
+	contractAddr, _, err := keepers.ContractKeeper.Instantiate(ctx, codeID, creator, nil, []byte("{}"), "reflect contract 1",
+		contractStart)
 	require.NoError(t, err)
 	require.NotEmpty(t, contractAddr)
 
@@ -139,7 +143,8 @@ func TestReflectGrpcQuery(t *testing.T) {
 		},
 	})
 	cdc := wasmKeeper.MakeEncodingConfig(t).Codec
-	ctx, keepers := wasmKeeper.CreateTestInput(t, false, ReflectCapabilities, wasmKeeper.WithMessageEncoders(reflectEncoders(cdc)), wasmKeeper.WithQueryPlugins(&queryPlugins))
+	ctx, keepers := wasmKeeper.CreateTestInput(t, false, ReflectCapabilities,
+		wasmKeeper.WithMessageEncoders(reflectEncoders(cdc)), wasmKeeper.WithQueryPlugins(&queryPlugins))
 	keeper := keepers.WasmKeeper
 
 	creator := wasmKeeper.RandomAccountAddress(t)
@@ -150,7 +155,8 @@ func TestReflectGrpcQuery(t *testing.T) {
 	require.Equal(t, uint64(1), codeID)
 
 	// creator instantiates a contract
-	contractAddr, _, err := keepers.ContractKeeper.Instantiate(ctx, codeID, creator, nil, []byte("{}"), "reflect contract 1", sdk.NewCoins())
+	contractAddr, _, err := keepers.ContractKeeper.Instantiate(ctx, codeID, creator, nil, []byte("{}"), "reflect contract 1",
+		sdk.NewCoins())
 	require.NoError(t, err)
 	require.NotEmpty(t, contractAddr)
 
@@ -181,7 +187,8 @@ func TestReflectGrpcQuery(t *testing.T) {
 
 func TestReflectTotalSupplyQuery(t *testing.T) {
 	cdc := wasmKeeper.MakeEncodingConfig(t).Codec
-	ctx, keepers := wasmKeeper.CreateTestInput(t, false, ReflectCapabilities, wasmKeeper.WithMessageEncoders(reflectEncoders(cdc)), wasmKeeper.WithQueryPlugins(reflectPlugins()))
+	ctx, keepers := wasmKeeper.CreateTestInput(t, false, ReflectCapabilities,
+		wasmKeeper.WithMessageEncoders(reflectEncoders(cdc)), wasmKeeper.WithQueryPlugins(reflectPlugins()))
 	keeper := keepers.WasmKeeper
 	// upload code
 	codeID := wasmKeeper.StoreReflectContract(t, ctx, keepers).CodeID
@@ -232,7 +239,8 @@ func TestReflectTotalSupplyQuery(t *testing.T) {
 
 func TestReflectInvalidStargateQuery(t *testing.T) {
 	cdc := wasmKeeper.MakeEncodingConfig(t).Codec
-	ctx, keepers := wasmKeeper.CreateTestInput(t, false, ReflectCapabilities, wasmKeeper.WithMessageEncoders(reflectEncoders(cdc)), wasmKeeper.WithQueryPlugins(reflectPlugins()))
+	ctx, keepers := wasmKeeper.CreateTestInput(t, false, ReflectCapabilities,
+		wasmKeeper.WithMessageEncoders(reflectEncoders(cdc)), wasmKeeper.WithQueryPlugins(reflectPlugins()))
 	keeper := keepers.WasmKeeper
 
 	funds := sdk.NewCoins(sdk.NewInt64Coin("denom", 320000))
@@ -245,7 +253,8 @@ func TestReflectInvalidStargateQuery(t *testing.T) {
 	require.Equal(t, uint64(1), codeID)
 
 	// creator instantiates a contract and gives it tokens
-	contractAddr, _, err := keepers.ContractKeeper.Instantiate(ctx, codeID, creator, nil, []byte("{}"), "reflect contract 1", contractStart)
+	contractAddr, _, err := keepers.ContractKeeper.Instantiate(ctx, codeID, creator, nil, []byte("{}"), "reflect contract 1",
+		contractStart)
 	require.NoError(t, err)
 	require.NotEmpty(t, contractAddr)
 
@@ -313,7 +322,8 @@ type reflectState struct {
 
 func TestMaskReflectWasmQueries(t *testing.T) {
 	cdc := wasmKeeper.MakeEncodingConfig(t).Codec
-	ctx, keepers := wasmKeeper.CreateTestInput(t, false, ReflectCapabilities, wasmKeeper.WithMessageEncoders(reflectEncoders(cdc)), wasmKeeper.WithQueryPlugins(reflectPlugins()))
+	ctx, keepers := wasmKeeper.CreateTestInput(t, false, ReflectCapabilities,
+		wasmKeeper.WithMessageEncoders(reflectEncoders(cdc)), wasmKeeper.WithQueryPlugins(reflectPlugins()))
 	keeper := keepers.WasmKeeper
 
 	deposit := sdk.NewCoins(sdk.NewInt64Coin("denom", 100000))
@@ -326,7 +336,8 @@ func TestMaskReflectWasmQueries(t *testing.T) {
 
 	// creator instantiates a contract and gives it tokens
 	reflectStart := sdk.NewCoins(sdk.NewInt64Coin("denom", 40000))
-	reflectAddr, _, err := keepers.ContractKeeper.Instantiate(ctx, reflectID, creator, nil, []byte("{}"), "reflect contract 2", reflectStart)
+	reflectAddr, _, err := keepers.ContractKeeper.Instantiate(ctx, reflectID, creator, nil, []byte("{}"), "reflect contract 2",
+		reflectStart)
 	require.NoError(t, err)
 	require.NotEmpty(t, reflectAddr)
 
@@ -383,7 +394,8 @@ func TestMaskReflectWasmQueries(t *testing.T) {
 
 func TestWasmRawQueryWithNil(t *testing.T) {
 	cdc := wasmKeeper.MakeEncodingConfig(t).Codec
-	ctx, keepers := wasmKeeper.CreateTestInput(t, false, ReflectCapabilities, wasmKeeper.WithMessageEncoders(reflectEncoders(cdc)), wasmKeeper.WithQueryPlugins(reflectPlugins()))
+	ctx, keepers := wasmKeeper.CreateTestInput(t, false, ReflectCapabilities,
+		wasmKeeper.WithMessageEncoders(reflectEncoders(cdc)), wasmKeeper.WithQueryPlugins(reflectPlugins()))
 	keeper := keepers.WasmKeeper
 
 	deposit := sdk.NewCoins(sdk.NewInt64Coin("denom", 100000))
@@ -396,7 +408,8 @@ func TestWasmRawQueryWithNil(t *testing.T) {
 
 	// creator instantiates a contract and gives it tokens
 	reflectStart := sdk.NewCoins(sdk.NewInt64Coin("denom", 40000))
-	reflectAddr, _, err := keepers.ContractKeeper.Instantiate(ctx, reflectID, creator, nil, []byte("{}"), "reflect contract 2", reflectStart)
+	reflectAddr, _, err := keepers.ContractKeeper.Instantiate(ctx, reflectID, creator, nil, []byte("{}"), "reflect contract 2",
+		reflectStart)
 	require.NoError(t, err)
 	require.NotEmpty(t, reflectAddr)
 
@@ -529,7 +542,8 @@ func TestQueryDenomsIntegration(t *testing.T) {
 			gotData, gotErr := k.QuerySmart(ctx, contractAddr, []byte(spec.query))
 			if spec.expErr != nil {
 				require.Error(t, gotErr)
-				assert.Contains(t, gotErr.Error(), fmt.Sprintf("codespace: %s, code: %d:", spec.expErr.Codespace(), spec.expErr.ABCICode()))
+				assert.Contains(t, gotErr.Error(),
+					fmt.Sprintf("codespace: %s, code: %d:", spec.expErr.Codespace(), spec.expErr.ABCICode()))
 				return
 			}
 			require.NoError(t, gotErr)
@@ -540,12 +554,15 @@ func TestQueryDenomsIntegration(t *testing.T) {
 
 func TestDistributionQuery(t *testing.T) {
 	cdc := wasmKeeper.MakeEncodingConfig(t).Codec
-	pCtx, keepers := wasmKeeper.CreateTestInput(t, false, ReflectCapabilities, wasmKeeper.WithMessageEncoders(reflectEncoders(cdc)), wasmKeeper.WithQueryPlugins(reflectPlugins()))
+	pCtx, keepers := wasmKeeper.CreateTestInput(t, false, ReflectCapabilities,
+		wasmKeeper.WithMessageEncoders(reflectEncoders(cdc)), wasmKeeper.WithQueryPlugins(reflectPlugins()))
 	keeper := keepers.WasmKeeper
 
 	example := wasmKeeper.InstantiateReflectExampleContract(t, pCtx, keepers)
-	delegator := keepers.Faucet.NewFundedRandomAccount(pCtx, sdk.NewCoins(sdk.NewInt64Coin(sdk.DefaultBondDenom, 100_000_000))...)
-	otherAddr := keepers.Faucet.NewFundedRandomAccount(pCtx, sdk.NewCoins(sdk.NewInt64Coin(sdk.DefaultBondDenom, 100_000_000))...)
+	delegator := keepers.Faucet.NewFundedRandomAccount(pCtx,
+		sdk.NewCoins(sdk.NewInt64Coin(sdk.DefaultBondDenom, 100_000_000))...)
+	otherAddr := keepers.Faucet.NewFundedRandomAccount(pCtx,
+		sdk.NewCoins(sdk.NewInt64Coin(sdk.DefaultBondDenom, 100_000_000))...)
 
 	val1Addr := addValidator(t, pCtx, keepers.StakingKeeper, keepers.Faucet, sdk.NewInt64Coin(sdk.DefaultBondDenom, 10_000_000))
 	val2Addr := addValidator(t, pCtx, keepers.StakingKeeper, keepers.Faucet, sdk.NewInt64Coin(sdk.DefaultBondDenom, 20_000_000))
@@ -594,13 +611,15 @@ func TestDistributionQuery(t *testing.T) {
 			setup: func(t *testing.T, ctx sdk.Context) sdk.Context {
 				val1, err := keepers.StakingKeeper.GetValidator(ctx, val1Addr)
 				require.NoError(t, err)
-				_, err = keepers.StakingKeeper.Delegate(ctx, delegator, sdkmath.NewInt(10_000_000), stakingtypes.Unbonded, val1, true)
+				_, err = keepers.StakingKeeper.Delegate(ctx, delegator, sdkmath.NewInt(10_000_000), stakingtypes.Unbonded, val1,
+					true)
 				require.NoError(t, err)
 				setValidatorRewards(ctx, keepers.StakingKeeper, keepers.DistKeeper, val1Addr, "100000000")
 				return nextBlock(ctx, keepers.StakingKeeper)
 			},
 			query: &wasmvmtypes.DistributionQuery{
-				DelegationRewards: &wasmvmtypes.DelegationRewardsQuery{DelegatorAddress: delegator.String(), ValidatorAddress: val1Addr.String()},
+				DelegationRewards: &wasmvmtypes.DelegationRewardsQuery{DelegatorAddress: delegator.String(),
+					ValidatorAddress: val1Addr.String()},
 			},
 			assert: func(t *testing.T, d []byte) {
 				var rsp wasmvmtypes.DelegationRewardsResponse
@@ -615,7 +634,8 @@ func TestDistributionQuery(t *testing.T) {
 				return nextBlock(ctx, keepers.StakingKeeper)
 			},
 			query: &wasmvmtypes.DistributionQuery{
-				DelegationRewards: &wasmvmtypes.DelegationRewardsQuery{DelegatorAddress: delegator.String(), ValidatorAddress: val1Addr.String()},
+				DelegationRewards: &wasmvmtypes.DelegationRewardsQuery{DelegatorAddress: delegator.String(),
+					ValidatorAddress: val1Addr.String()},
 			},
 			expErr: true,
 		},
@@ -623,7 +643,8 @@ func TestDistributionQuery(t *testing.T) {
 			setup: func(t *testing.T, ctx sdk.Context) sdk.Context {
 				val, err := keepers.StakingKeeper.GetValidator(ctx, val1Addr)
 				require.NoError(t, err)
-				_, err = keepers.StakingKeeper.Delegate(ctx, delegator, sdkmath.NewInt(10_000_000), stakingtypes.Unbonded, val, true)
+				_, err = keepers.StakingKeeper.Delegate(ctx, delegator, sdkmath.NewInt(10_000_000), stakingtypes.Unbonded, val,
+					true)
 				require.NoError(t, err)
 				return ctx
 			},
@@ -636,7 +657,8 @@ func TestDistributionQuery(t *testing.T) {
 			setup: func(t *testing.T, ctx sdk.Context) sdk.Context {
 				val, err := keepers.StakingKeeper.GetValidator(ctx, val1Addr)
 				require.NoError(t, err)
-				_, err = keepers.StakingKeeper.Delegate(ctx, delegator, sdkmath.NewInt(10_000_000), stakingtypes.Unbonded, val, true)
+				_, err = keepers.StakingKeeper.Delegate(ctx, delegator, sdkmath.NewInt(10_000_000), stakingtypes.Unbonded, val,
+					true)
 				require.NoError(t, err)
 				setValidatorRewards(ctx, keepers.StakingKeeper, keepers.DistKeeper, val1Addr, "100000000")
 				return nextBlock(ctx, keepers.StakingKeeper)
@@ -663,7 +685,8 @@ func TestDistributionQuery(t *testing.T) {
 				for _, v := range []sdk.ValAddress{val1Addr, val2Addr} {
 					val, err := keepers.StakingKeeper.GetValidator(ctx, v)
 					require.NoError(t, err)
-					_, err = keepers.StakingKeeper.Delegate(ctx, delegator, sdkmath.NewInt(10_000_000), stakingtypes.Unbonded, val, true)
+					_, err = keepers.StakingKeeper.Delegate(ctx, delegator, sdkmath.NewInt(10_000_000), stakingtypes.Unbonded,
+						val, true)
 					require.NoError(t, err)
 				}
 				return ctx
@@ -709,7 +732,8 @@ func TestDistributionQuery(t *testing.T) {
 
 func TestIBCListChannelsQuery(t *testing.T) {
 	cdc := wasmKeeper.MakeEncodingConfig(t).Codec
-	pCtx, keepers := keeper.CreateTestInput(t, false, ReflectCapabilities, keeper.WithMessageEncoders(reflectEncoders(cdc)), keeper.WithQueryPlugins(reflectPlugins()))
+	pCtx, keepers := keeper.CreateTestInput(t, false, ReflectCapabilities, keeper.WithMessageEncoders(reflectEncoders(cdc)),
+		keeper.WithQueryPlugins(reflectPlugins()))
 	keeper := keepers.WasmKeeper
 	nonIbcExample := wasmKeeper.InstantiateReflectExampleContract(t, pCtx, keepers)
 	// add an ibc port for testing
@@ -772,7 +796,8 @@ func TestIBCListChannelsQuery(t *testing.T) {
 		},
 	}
 
-	withChannelsStored := func(portID string, channels ...channeltypes.Channel) func(t *testing.T, ctx sdk.Context) sdk.Context {
+	withChannelsStored := func(portID string, channels ...channeltypes.Channel) func(t *testing.T,
+		ctx sdk.Context) sdk.Context {
 		return func(t *testing.T, ctx sdk.Context) sdk.Context {
 			for i, v := range channels {
 				keepers.IBCKeeper.ChannelKeeper.SetChannel(ctx, portID, fmt.Sprintf("channel-%d", i), v)
@@ -972,7 +997,8 @@ func TestAcceptListStargateQuerier(t *testing.T) {
 				Path: "/cosmos.auth.v1beta1.Query/Account",
 				Data: marshal(&authtypes.QueryAccountRequest{Address: addrs[0].String()}),
 			},
-			expResp: fmt.Sprintf(`{"account":{"@type":"/cosmos.auth.v1beta1.BaseAccount","address":%q,"pub_key":null,"account_number":"1","sequence":"0"}}`, addrs[0].String()),
+			expResp: fmt.Sprintf(`{"account":{"@type":"/cosmos.auth.v1beta1.BaseAccount","address":%q,"pub_key":null,"account_number":"1","sequence":"0"}}`,
+				addrs[0].String()),
 		},
 		"in accept list - error result": {
 			req: &wasmvmtypes.StargateQuery{
@@ -1091,7 +1117,8 @@ func TestDeterministicJsonMarshal(t *testing.T) {
 
 			originVersionBz, err := hex.DecodeString(tc.originalResponse)
 			require.NoError(t, err)
-			jsonMarshalledOriginalBz, err := wasmKeeper.ConvertProtoToJSONMarshal(appCodec, tc.responseProtoStruct, originVersionBz)
+			jsonMarshalledOriginalBz, err := wasmKeeper.ConvertProtoToJSONMarshal(appCodec, tc.responseProtoStruct,
+				originVersionBz)
 			require.NoError(t, err)
 
 			newVersionBz, err := hex.DecodeString(tc.updatedResponse)
@@ -1146,7 +1173,8 @@ func TestConvertProtoToJSONMarshal(t *testing.T) {
 			require.NoError(t, err)
 			appCodec := app.MakeEncodingConfig(t).Codec
 
-			jsonMarshalledResponse, err := wasmKeeper.ConvertProtoToJSONMarshal(appCodec, tc.protoResponseStruct, originalVersionBz)
+			jsonMarshalledResponse, err := wasmKeeper.ConvertProtoToJSONMarshal(appCodec, tc.protoResponseStruct,
+				originalVersionBz)
 			if tc.expectedError {
 				require.Error(t, err)
 				return

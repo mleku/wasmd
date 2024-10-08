@@ -9,12 +9,12 @@ import (
 	"testing"
 	"time"
 
-	wasmvm "github.com/CosmWasm/wasmvm/v2"
-	wasmvmtypes "github.com/CosmWasm/wasmvm/v2/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	wasmvm "wasm.mleku.dev"
+	wasmvmtypes "wasm.mleku.dev/types"
 
 	errorsmod "cosmossdk.io/errors"
 	"cosmossdk.io/log"
@@ -25,8 +25,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/query"
 	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 
-	"github.com/CosmWasm/wasmd/x/wasm/keeper/wasmtesting"
-	"github.com/CosmWasm/wasmd/x/wasm/types"
+	"wasmd.mleku.dev/x/wasm/keeper/wasmtesting"
+	"wasmd.mleku.dev/x/wasm/types"
 )
 
 func TestQueryAllContractState(t *testing.T) {
@@ -145,8 +145,9 @@ func TestQuerySmartContractState(t *testing.T) {
 			expResp:  fmt.Sprintf(`{"verifier":"%s"}`, exampleContract.VerifierAddr.String()),
 		},
 		"query smart invalid request": {
-			srcQuery: &types.QuerySmartContractStateRequest{Address: contractAddr, QueryData: []byte(`{"raw":{"key":"config"}}`)},
-			expErr:   types.ErrQueryFailed,
+			srcQuery: &types.QuerySmartContractStateRequest{Address: contractAddr,
+				QueryData: []byte(`{"raw":{"key":"config"}}`)},
+			expErr: types.ErrQueryFailed,
 		},
 		"query smart with invalid json": {
 			srcQuery: &types.QuerySmartContractStateRequest{Address: contractAddr, QueryData: []byte(`not a json string`)},
@@ -198,7 +199,9 @@ func TestQuerySmartContractPanics(t *testing.T) {
 	}
 	for msg, spec := range specs {
 		t.Run(msg, func(t *testing.T) {
-			keepers.WasmKeeper.wasmVM = &wasmtesting.MockWasmEngine{QueryFn: func(checksum wasmvm.Checksum, env wasmvmtypes.Env, queryMsg []byte, store wasmvm.KVStore, goapi wasmvm.GoAPI, querier wasmvm.Querier, gasMeter wasmvm.GasMeter, gasLimit uint64, deserCost wasmvmtypes.UFraction) (*wasmvmtypes.QueryResult, uint64, error) {
+			keepers.WasmKeeper.wasmVM = &wasmtesting.MockWasmEngine{QueryFn: func(checksum wasmvm.Checksum, env wasmvmtypes.Env,
+				queryMsg []byte, store wasmvm.KVStore, goapi wasmvm.GoAPI, querier wasmvm.Querier, gasMeter wasmvm.GasMeter,
+				gasLimit uint64, deserCost wasmvmtypes.UFraction) (*wasmvmtypes.QueryResult, uint64, error) {
 				spec.doInContract()
 				return &wasmvmtypes.QueryResult{}, 0, nil
 			}}
@@ -312,7 +315,8 @@ func TestQueryContractsByCode(t *testing.T) {
 			ctx = setBlock(ctx, h)
 			h++
 		}
-		addr, _, err := keepers.ContractKeeper.Instantiate(ctx, codeID, creator, nil, initMsgBz, fmt.Sprintf("contract %d", i), topUp)
+		addr, _, err := keepers.ContractKeeper.Instantiate(ctx, codeID, creator, nil, initMsgBz, fmt.Sprintf("contract %d", i),
+			topUp)
 		contractAddrs = append(contractAddrs, addr.String())
 		require.NoError(t, err)
 	}
@@ -982,7 +986,8 @@ func TestQueryContractsByCreatorList(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		ctx = setBlock(ctx, h)
 		h++
-		contract, _, err := keepers.ContractKeeper.Instantiate(ctx, codeID, creator, nil, initMsgBz, fmt.Sprintf("contract %d", i), topUp)
+		contract, _, err := keepers.ContractKeeper.Instantiate(ctx, codeID, creator, nil, initMsgBz,
+			fmt.Sprintf("contract %d", i), topUp)
 		allExpecedContracts = append(allExpecedContracts, contract.String())
 		require.NoError(t, err)
 	}

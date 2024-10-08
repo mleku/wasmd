@@ -15,9 +15,9 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/group"
 
-	"github.com/CosmWasm/wasmd/tests/e2e"
-	"github.com/CosmWasm/wasmd/tests/ibctesting"
-	"github.com/CosmWasm/wasmd/x/wasm/types"
+	"wasmd.mleku.dev/tests/e2e"
+	"wasmd.mleku.dev/tests/ibctesting"
+	"wasmd.mleku.dev/x/wasm/types"
 )
 
 func TestGroupWithContract(t *testing.T) {
@@ -57,8 +57,10 @@ func TestGroupWithContract(t *testing.T) {
 	// and a proposal submitted
 	recipientAddr := sdk.AccAddress(rand.Bytes(address.Len))
 
-	payload := []sdk.Msg{banktypes.NewMsgSend(policyAddr, recipientAddr, sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdkmath.OneInt())))}
-	propMsg, err := group.NewMsgSubmitProposal(policyAddr.String(), []string{contractAddr.String()}, payload, "my proposal", group.Exec_EXEC_TRY, "my title", "my description")
+	payload := []sdk.Msg{banktypes.NewMsgSend(policyAddr, recipientAddr,
+		sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdkmath.OneInt())))}
+	propMsg, err := group.NewMsgSubmitProposal(policyAddr.String(), []string{contractAddr.String()}, payload, "my proposal",
+		group.Exec_EXEC_TRY, "my title", "my description")
 	require.NoError(t, err)
 
 	rsp = e2e.MustExecViaStargateReflectContract(t, chain, contractAddr, propMsg)
@@ -112,8 +114,10 @@ func TestGroupWithNewReflectContract(t *testing.T) {
 	// and a proposal submitted
 	recipientAddr := sdk.AccAddress(rand.Bytes(address.Len))
 
-	payload := []sdk.Msg{banktypes.NewMsgSend(policyAddr, recipientAddr, sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdkmath.OneInt())))}
-	propMsg, err := group.NewMsgSubmitProposal(policyAddr.String(), []string{contractAddr.String()}, payload, "my proposal", group.Exec_EXEC_TRY, "my title", "my description")
+	payload := []sdk.Msg{banktypes.NewMsgSend(policyAddr, recipientAddr,
+		sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdkmath.OneInt())))}
+	propMsg, err := group.NewMsgSubmitProposal(policyAddr.String(), []string{contractAddr.String()}, payload, "my proposal",
+		group.Exec_EXEC_TRY, "my title", "my description")
 	require.NoError(t, err)
 
 	rsp = e2e.MustExecViaAnyReflectContract(t, chain, contractAddr, propMsg)

@@ -7,11 +7,11 @@ import (
 	"runtime/debug"
 	"strings"
 
-	wasmvm "github.com/CosmWasm/wasmvm/v2"
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
+	wasmvm "wasm.mleku.dev"
 
 	"cosmossdk.io/core/appmodule"
 
@@ -25,11 +25,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	"github.com/CosmWasm/wasmd/x/wasm/client/cli"
-	"github.com/CosmWasm/wasmd/x/wasm/exported"
-	"github.com/CosmWasm/wasmd/x/wasm/keeper"
-	"github.com/CosmWasm/wasmd/x/wasm/simulation"
-	"github.com/CosmWasm/wasmd/x/wasm/types"
+	"wasmd.mleku.dev/x/wasm/client/cli"
+	"wasmd.mleku.dev/x/wasm/exported"
+	"wasmd.mleku.dev/x/wasm/keeper"
+	"wasmd.mleku.dev/x/wasm/simulation"
+	"wasmd.mleku.dev/x/wasm/types"
 )
 
 var (
@@ -223,10 +223,13 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 // AddModuleInitFlags implements servertypes.ModuleInitFlags interface.
 func AddModuleInitFlags(startCmd *cobra.Command) {
 	defaults := types.DefaultWasmConfig()
-	startCmd.Flags().Uint32(flagWasmMemoryCacheSize, defaults.MemoryCacheSize, "Sets the size in MiB (NOT bytes) of an in-memory cache for Wasm modules. Set to 0 to disable.")
-	startCmd.Flags().Uint64(flagWasmQueryGasLimit, defaults.SmartQueryGasLimit, "Set the max gas that can be spent on executing a query with a Wasm contract")
+	startCmd.Flags().Uint32(flagWasmMemoryCacheSize, defaults.MemoryCacheSize,
+		"Sets the size in MiB (NOT bytes) of an in-memory cache for Wasm modules. Set to 0 to disable.")
+	startCmd.Flags().Uint64(flagWasmQueryGasLimit, defaults.SmartQueryGasLimit,
+		"Set the max gas that can be spent on executing a query with a Wasm contract")
 	startCmd.Flags().String(flagWasmSimulationGasLimit, "", "Set the max gas that can be spent when executing a simulation TX")
-	startCmd.Flags().Bool(flagWasmSkipWasmVMVersionCheck, false, "Skip check that ensures that libwasmvm version (the Rust project) and wasmvm version (the Go project) match")
+	startCmd.Flags().Bool(flagWasmSkipWasmVMVersionCheck, false,
+		"Skip check that ensures that libwasmvm version (the Rust project) and wasmvm version (the Go project) match")
 
 	preCheck := func(cmd *cobra.Command, _ []string) error {
 		skip, err := cmd.Flags().GetBool(flagWasmSkipWasmVMVersionCheck)
@@ -280,7 +283,7 @@ func getExpectedLibwasmVersion() string {
 		panic("can't read build info")
 	}
 	for _, d := range buildInfo.Deps {
-		if d.Path != "github.com/CosmWasm/wasmvm/v2" {
+		if d.Path != "wasm.mleku.dev" {
 			continue
 		}
 		if d.Replace != nil {

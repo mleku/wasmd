@@ -4,15 +4,15 @@ import (
 	"context"
 	"fmt"
 
-	wasmvmtypes "github.com/CosmWasm/wasmvm/v2/types"
 	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
 	clienttypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
 	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
 	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
+	wasmvmtypes "wasm.mleku.dev/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/CosmWasm/wasmd/x/wasm/types"
+	"wasmd.mleku.dev/x/wasm/types"
 )
 
 type MockChannelKeeper struct {
@@ -45,7 +45,8 @@ func (m *MockChannelKeeper) GetNextSequenceSend(ctx sdk.Context, portID, channel
 	return m.GetNextSequenceSendFn(ctx, portID, channelID)
 }
 
-func (m *MockChannelKeeper) ChanCloseInit(ctx sdk.Context, portID, channelID string, chanCap *capabilitytypes.Capability) error {
+func (m *MockChannelKeeper) ChanCloseInit(ctx sdk.Context, portID, channelID string,
+	chanCap *capabilitytypes.Capability) error {
 	if m.ChanCloseInitFn == nil {
 		panic("not supposed to be called!")
 	}
@@ -69,11 +70,14 @@ func (m *MockChannelKeeper) SetChannel(ctx sdk.Context, portID, channelID string
 var _ types.ICS4Wrapper = &MockICS4Wrapper{}
 
 type MockICS4Wrapper struct {
-	SendPacketFn           func(ctx sdk.Context, channelCap *capabilitytypes.Capability, sourcePort, sourceChannel string, timeoutHeight clienttypes.Height, timeoutTimestamp uint64, data []byte) (uint64, error)
-	WriteAcknowledgementFn func(ctx sdk.Context, chanCap *capabilitytypes.Capability, packet ibcexported.PacketI, acknowledgement ibcexported.Acknowledgement) error
+	SendPacketFn func(ctx sdk.Context, channelCap *capabilitytypes.Capability, sourcePort, sourceChannel string,
+		timeoutHeight clienttypes.Height, timeoutTimestamp uint64, data []byte) (uint64, error)
+	WriteAcknowledgementFn func(ctx sdk.Context, chanCap *capabilitytypes.Capability, packet ibcexported.PacketI,
+		acknowledgement ibcexported.Acknowledgement) error
 }
 
-func (m *MockICS4Wrapper) SendPacket(ctx sdk.Context, channelCap *capabilitytypes.Capability, sourcePort, sourceChannel string, timeoutHeight clienttypes.Height, timeoutTimestamp uint64, data []byte) (uint64, error) {
+func (m *MockICS4Wrapper) SendPacket(ctx sdk.Context, channelCap *capabilitytypes.Capability, sourcePort, sourceChannel string,
+	timeoutHeight clienttypes.Height, timeoutTimestamp uint64, data []byte) (uint64, error) {
 	if m.SendPacketFn == nil {
 		panic("not supposed to be called!")
 	}
@@ -92,7 +96,8 @@ func (m *MockICS4Wrapper) WriteAcknowledgement(
 	return m.WriteAcknowledgementFn(ctx, chanCap, packet, acknowledgement)
 }
 
-func MockChannelKeeperIterator(s []channeltypes.IdentifiedChannel) func(ctx sdk.Context, cb func(channeltypes.IdentifiedChannel) bool) {
+func MockChannelKeeperIterator(s []channeltypes.IdentifiedChannel) func(ctx sdk.Context,
+	cb func(channeltypes.IdentifiedChannel) bool) {
 	return func(ctx sdk.Context, cb func(channeltypes.IdentifiedChannel) bool) {
 		for _, channel := range s {
 			stop := cb(channel)
@@ -123,7 +128,8 @@ func (m MockCapabilityKeeper) ClaimCapability(ctx sdk.Context, cap *capabilityty
 	return m.ClaimCapabilityFn(ctx, cap, name)
 }
 
-func (m MockCapabilityKeeper) AuthenticateCapability(ctx sdk.Context, capability *capabilitytypes.Capability, name string) bool {
+func (m MockCapabilityKeeper) AuthenticateCapability(ctx sdk.Context, capability *capabilitytypes.Capability,
+	name string) bool {
 	if m.AuthenticateCapabilityFn == nil {
 		panic("not supposed to be called!")
 	}
@@ -147,19 +153,22 @@ var _ types.IBCContractKeeper = &IBCContractKeeperMock{}
 
 type IBCContractKeeperMock struct {
 	types.IBCContractKeeper
-	OnRecvPacketFn func(ctx sdk.Context, contractAddr sdk.AccAddress, msg wasmvmtypes.IBCPacketReceiveMsg) (ibcexported.Acknowledgement, error)
+	OnRecvPacketFn func(ctx sdk.Context, contractAddr sdk.AccAddress,
+		msg wasmvmtypes.IBCPacketReceiveMsg) (ibcexported.Acknowledgement, error)
 
 	packets map[string]channeltypes.Packet
 }
 
-func (m *IBCContractKeeperMock) OnRecvPacket(ctx sdk.Context, contractAddr sdk.AccAddress, msg wasmvmtypes.IBCPacketReceiveMsg) (ibcexported.Acknowledgement, error) {
+func (m *IBCContractKeeperMock) OnRecvPacket(ctx sdk.Context, contractAddr sdk.AccAddress,
+	msg wasmvmtypes.IBCPacketReceiveMsg) (ibcexported.Acknowledgement, error) {
 	if m.OnRecvPacketFn == nil {
 		panic("not expected to be called")
 	}
 	return m.OnRecvPacketFn(ctx, contractAddr, msg)
 }
 
-func (m *IBCContractKeeperMock) LoadAsyncAckPacket(ctx context.Context, portID, channelID string, sequence uint64) (channeltypes.Packet, error) {
+func (m *IBCContractKeeperMock) LoadAsyncAckPacket(ctx context.Context, portID, channelID string,
+	sequence uint64) (channeltypes.Packet, error) {
 	if m.packets == nil {
 		m.packets = make(map[string]channeltypes.Packet)
 	}

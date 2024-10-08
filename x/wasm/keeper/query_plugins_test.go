@@ -6,12 +6,12 @@ import (
 	"math"
 	"testing"
 
-	wasmvmtypes "github.com/CosmWasm/wasmvm/v2/types"
 	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	dbm "github.com/cosmos/cosmos-db"
 	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	wasmvmtypes "wasm.mleku.dev/types"
 
 	errorsmod "cosmossdk.io/errors"
 	"cosmossdk.io/log"
@@ -24,9 +24,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/query"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
-	"github.com/CosmWasm/wasmd/x/wasm/keeper"
-	"github.com/CosmWasm/wasmd/x/wasm/keeper/wasmtesting"
-	"github.com/CosmWasm/wasmd/x/wasm/types"
+	"wasmd.mleku.dev/x/wasm/keeper"
+	"wasmd.mleku.dev/x/wasm/keeper/wasmtesting"
+	"wasmd.mleku.dev/x/wasm/types"
 )
 
 func TestIBCQuerier(t *testing.T) {
@@ -290,7 +290,8 @@ func TestBankQuerierAllMetadata(t *testing.T) {
 		},
 	}
 
-	mock := bankKeeperMock{GetDenomsMetadataFn: func(ctx context.Context, req *banktypes.QueryDenomsMetadataRequest) (*banktypes.QueryDenomsMetadataResponse, error) {
+	mock := bankKeeperMock{GetDenomsMetadataFn: func(ctx context.Context,
+		req *banktypes.QueryDenomsMetadataRequest) (*banktypes.QueryDenomsMetadataResponse, error) {
 		return &banktypes.QueryDenomsMetadataResponse{
 			Metadatas:  metadata,
 			Pagination: &query.PageResponse{},
@@ -324,7 +325,8 @@ func TestBankQuerierAllMetadata(t *testing.T) {
 
 func TestBankQuerierAllMetadataPagination(t *testing.T) {
 	var capturedPagination *query.PageRequest
-	mock := bankKeeperMock{GetDenomsMetadataFn: func(ctx context.Context, req *banktypes.QueryDenomsMetadataRequest) (*banktypes.QueryDenomsMetadataResponse, error) {
+	mock := bankKeeperMock{GetDenomsMetadataFn: func(ctx context.Context,
+		req *banktypes.QueryDenomsMetadataRequest) (*banktypes.QueryDenomsMetadataResponse, error) {
 		capturedPagination = req.Pagination
 		return &banktypes.QueryDenomsMetadataResponse{
 			Metadatas: []banktypes.Metadata{},
@@ -395,7 +397,8 @@ func TestContractInfoWasmQuerier(t *testing.T) {
 			req: &wasmvmtypes.WasmQuery{
 				ContractInfo: &wasmvmtypes.ContractInfoQuery{ContractAddr: myValidContractAddr},
 			},
-			mock: mockWasmQueryKeeper{GetContractInfoFn: func(ctx context.Context, contractAddress sdk.AccAddress) *types.ContractInfo {
+			mock: mockWasmQueryKeeper{GetContractInfoFn: func(ctx context.Context,
+				contractAddress sdk.AccAddress) *types.ContractInfo {
 				return nil
 			}},
 			expErr: true,
@@ -548,11 +551,13 @@ func TestQueryErrors(t *testing.T) {
 	}
 	for name, spec := range specs {
 		t.Run(name, func(t *testing.T) {
-			mock := keeper.WasmVMQueryHandlerFn(func(ctx sdk.Context, caller sdk.AccAddress, request wasmvmtypes.QueryRequest) ([]byte, error) {
+			mock := keeper.WasmVMQueryHandlerFn(func(ctx sdk.Context, caller sdk.AccAddress,
+				request wasmvmtypes.QueryRequest) ([]byte, error) {
 				return nil, spec.src
 			})
 			ms := store.NewCommitMultiStore(dbm.NewMemDB(), log.NewTestLogger(t), storemetrics.NewNoOpMetrics())
-			ctx := sdk.NewContext(ms, cmtproto.Header{}, false, log.NewTestLogger(t)).WithGasMeter(storetypes.NewInfiniteGasMeter())
+			ctx := sdk.NewContext(ms, cmtproto.Header{}, false,
+				log.NewTestLogger(t)).WithGasMeter(storetypes.NewInfiniteGasMeter())
 			q := keeper.NewQueryHandler(ctx, mock, sdk.AccAddress{}, types.NewDefaultWasmGasRegister())
 			_, gotErr := q.Query(wasmvmtypes.QueryRequest{}, 1)
 			assert.Equal(t, spec.expErr, gotErr)
@@ -608,7 +613,8 @@ type bankKeeperMock struct {
 	GetBalanceFn        func(ctx context.Context, addr sdk.AccAddress, denom string) sdk.Coin
 	GetAllBalancesFn    func(ctx context.Context, addr sdk.AccAddress) sdk.Coins
 	GetDenomMetadataFn  func(ctx context.Context, denom string) (banktypes.Metadata, bool)
-	GetDenomsMetadataFn func(ctx context.Context, req *banktypes.QueryDenomsMetadataRequest) (*banktypes.QueryDenomsMetadataResponse, error)
+	GetDenomsMetadataFn func(ctx context.Context,
+		req *banktypes.QueryDenomsMetadataRequest) (*banktypes.QueryDenomsMetadataResponse, error)
 }
 
 func (m bankKeeperMock) GetSupply(ctx context.Context, denom string) sdk.Coin {
@@ -639,7 +645,8 @@ func (m bankKeeperMock) GetDenomMetaData(ctx context.Context, denom string) (ban
 	return m.GetDenomMetadataFn(ctx, denom)
 }
 
-func (m bankKeeperMock) DenomsMetadata(ctx context.Context, req *banktypes.QueryDenomsMetadataRequest) (*banktypes.QueryDenomsMetadataResponse, error) {
+func (m bankKeeperMock) DenomsMetadata(ctx context.Context,
+	req *banktypes.QueryDenomsMetadataRequest) (*banktypes.QueryDenomsMetadataResponse, error) {
 	if m.GetDenomsMetadataFn == nil {
 		panic("not expected to be called")
 	}
@@ -657,7 +664,8 @@ func TestConvertSDKDecCoinToWasmDecCoin(t *testing.T) {
 		},
 		"multiple coins": {
 			src: sdk.NewDecCoins(sdk.NewInt64DecCoin("alx", 1), sdk.NewInt64DecCoin("blx", 2)),
-			exp: []wasmvmtypes.DecCoin{{Amount: "1.000000000000000000", Denom: "alx"}, {Amount: "2.000000000000000000", Denom: "blx"}},
+			exp: []wasmvmtypes.DecCoin{{Amount: "1.000000000000000000", Denom: "alx"},
+				{Amount: "2.000000000000000000", Denom: "blx"}},
 		},
 		"small amount": {
 			src: sdk.NewDecCoins(sdk.NewDecCoinFromDec("alx", sdkmath.LegacyNewDecWithPrec(1, 18))),

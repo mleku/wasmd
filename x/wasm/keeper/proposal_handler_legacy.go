@@ -11,7 +11,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 
-	"github.com/CosmWasm/wasmd/x/wasm/types"
+	"wasmd.mleku.dev/x/wasm/types"
 )
 
 // NewLegacyWasmProposalHandler creates a new governance Handler for wasm proposals
@@ -34,7 +34,8 @@ func NewLegacyWasmProposalHandlerX(k types.ContractOpsKeeper, enabledProposalTyp
 			return errorsmod.Wrap(sdkerrors.ErrUnknownRequest, "content must not be empty")
 		}
 		if _, ok := enabledTypes[content.ProposalType()]; !ok {
-			return errorsmod.Wrapf(sdkerrors.ErrUnknownRequest, "unsupported wasm proposal content type: %q", content.ProposalType())
+			return errorsmod.Wrapf(sdkerrors.ErrUnknownRequest, "unsupported wasm proposal content type: %q",
+				content.ProposalType())
 		}
 		switch c := content.(type) {
 		case *types.StoreCodeProposal:
@@ -155,7 +156,8 @@ func handleInstantiate2Proposal(ctx sdk.Context, k types.ContractOpsKeeper, p ty
 }
 
 //nolint:staticcheck
-func handleStoreAndInstantiateContractProposal(ctx sdk.Context, k types.ContractOpsKeeper, p types.StoreAndInstantiateContractProposal) error {
+func handleStoreAndInstantiateContractProposal(ctx sdk.Context, k types.ContractOpsKeeper,
+	p types.StoreAndInstantiateContractProposal) error {
 	if err := p.ValidateBasic(); err != nil {
 		return err
 	}
@@ -327,14 +329,16 @@ func handleUnpinCodesProposal(ctx sdk.Context, k types.ContractOpsKeeper, p type
 }
 
 //nolint:staticcheck
-func handleUpdateInstantiateConfigProposal(ctx sdk.Context, k types.ContractOpsKeeper, p types.UpdateInstantiateConfigProposal) error {
+func handleUpdateInstantiateConfigProposal(ctx sdk.Context, k types.ContractOpsKeeper,
+	p types.UpdateInstantiateConfigProposal) error {
 	if err := p.ValidateBasic(); err != nil {
 		return err
 	}
 
 	var emptyCaller sdk.AccAddress
 	for _, accessConfigUpdate := range p.AccessConfigUpdates {
-		if err := k.SetAccessConfig(ctx, accessConfigUpdate.CodeID, emptyCaller, accessConfigUpdate.InstantiatePermission); err != nil {
+		if err := k.SetAccessConfig(ctx, accessConfigUpdate.CodeID, emptyCaller,
+			accessConfigUpdate.InstantiatePermission); err != nil {
 			return errorsmod.Wrapf(err, "code id: %d", accessConfigUpdate.CodeID)
 		}
 	}

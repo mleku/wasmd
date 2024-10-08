@@ -9,7 +9,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/CosmWasm/wasmd/x/wasm/types"
+	"wasmd.mleku.dev/x/wasm/types"
 )
 
 // ValidatorSetSource is a subset of the staking keeper
@@ -48,7 +48,8 @@ func InitGenesis(ctx sdk.Context, keeper *Keeper, data types.GenesisState) ([]ab
 		if err != nil {
 			return nil, errorsmod.Wrapf(err, "address in contract number %d", i)
 		}
-		err = keeper.importContract(ctx, contractAddr, &contract.ContractInfo, contract.ContractState, contract.ContractCodeHistory) //nolint:gosec
+		err = keeper.importContract(ctx, contractAddr, &contract.ContractInfo, contract.ContractState,
+			contract.ContractCodeHistory) //nolint:gosec
 		if err != nil {
 			return nil, errorsmod.Wrapf(err, "contract number %d", i)
 		}
@@ -67,7 +68,8 @@ func InitGenesis(ctx sdk.Context, keeper *Keeper, data types.GenesisState) ([]ab
 		return nil, err
 	}
 	if seqVal <= maxCodeID {
-		return nil, errorsmod.Wrapf(types.ErrInvalid, "seq %s with value: %d must be greater than: %d ", string(types.KeySequenceCodeID), seqVal, maxCodeID)
+		return nil, errorsmod.Wrapf(types.ErrInvalid, "seq %s with value: %d must be greater than: %d ",
+			string(types.KeySequenceCodeID), seqVal, maxCodeID)
 	}
 	// ensure next classic address is unused so that we know the sequence is good
 	rCtx, _ := ctx.CacheContext()
@@ -77,7 +79,8 @@ func InitGenesis(ctx sdk.Context, keeper *Keeper, data types.GenesisState) ([]ab
 	}
 	addr := keeper.ClassicAddressGenerator()(rCtx, seqVal, nil)
 	if keeper.HasContractInfo(ctx, addr) {
-		return nil, errorsmod.Wrapf(types.ErrInvalid, "value: %d for seq %s was used already", seqVal, string(types.KeySequenceInstanceID))
+		return nil, errorsmod.Wrapf(types.ErrInvalid, "value: %d for seq %s was used already", seqVal,
+			string(types.KeySequenceInstanceID))
 	}
 	return nil, nil
 }

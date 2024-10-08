@@ -8,8 +8,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/CosmWasm/wasmd/x/wasm/keeper/testdata"
-	"github.com/CosmWasm/wasmd/x/wasm/types"
+	"wasmd.mleku.dev/x/wasm/keeper/testdata"
+	"wasmd.mleku.dev/x/wasm/types"
 )
 
 func TestParseAccessConfigUpdates(t *testing.T) {
@@ -51,19 +51,22 @@ func TestParseAccessConfigUpdates(t *testing.T) {
 					CodeID: 1,
 					InstantiatePermission: types.AccessConfig{
 						Permission: types.AccessTypeAnyOfAddresses,
-						Addresses:  []string{"cosmos1vx8knpllrj7n963p9ttd80w47kpacrhuts497x", "cosmos14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9s4hmalr"},
+						Addresses: []string{"cosmos1vx8knpllrj7n963p9ttd80w47kpacrhuts497x",
+							"cosmos14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9s4hmalr"},
 					},
 				},
 			},
 		},
 		"multiple code ids with different permissions": {
-			src: []string{"1:cosmos1vx8knpllrj7n963p9ttd80w47kpacrhuts497x,cosmos14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9s4hmalr", "2:nobody"},
+			src: []string{"1:cosmos1vx8knpllrj7n963p9ttd80w47kpacrhuts497x,cosmos14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9s4hmalr",
+				"2:nobody"},
 			exp: []types.AccessConfigUpdate{
 				{
 					CodeID: 1,
 					InstantiatePermission: types.AccessConfig{
 						Permission: types.AccessTypeAnyOfAddresses,
-						Addresses:  []string{"cosmos1vx8knpllrj7n963p9ttd80w47kpacrhuts497x", "cosmos14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9s4hmalr"},
+						Addresses: []string{"cosmos1vx8knpllrj7n963p9ttd80w47kpacrhuts497x",
+							"cosmos14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9s4hmalr"},
 					},
 				}, {
 					CodeID: 2,
@@ -100,7 +103,7 @@ func TestParseAccessConfigUpdates(t *testing.T) {
 }
 
 func TestParseCodeInfoFlags(t *testing.T) {
-	correctSource := "https://github.com/CosmWasm/wasmd/blob/main/x/wasm/keeper/testdata/hackatom.wasm"
+	correctSource := "https://wasmd.mleku.dev/blob/main/x/wasm/keeper/testdata/hackatom.wasm"
 	correctBuilderRef := "cosmwasm/workspace-optimizer:0.12.9"
 
 	wasmBin, err := os.ReadFile("../../keeper/testdata/hackatom.wasm.gzip")
@@ -125,7 +128,8 @@ func TestParseCodeInfoFlags(t *testing.T) {
 			expErr: true,
 		},
 		"source format wrong": {
-			args:   []string{"--code-source-url=" + "format_wrong", "--builder=" + correctBuilderRef, "--code-hash=" + checksumStr},
+			args: []string{"--code-source-url=" + "format_wrong", "--builder=" + correctBuilderRef,
+				"--code-hash=" + checksumStr},
 			expErr: true,
 		},
 		"builder format wrong": {
@@ -141,7 +145,8 @@ func TestParseCodeInfoFlags(t *testing.T) {
 			expErr: false,
 		},
 		"happy path all set": {
-			args:   []string{"--code-source-url=" + correctSource, "--builder=" + correctBuilderRef, "--code-hash=" + checksumStr},
+			args: []string{"--code-source-url=" + correctSource, "--builder=" + correctBuilderRef,
+				"--code-hash=" + checksumStr},
 			expErr: false,
 		},
 	}

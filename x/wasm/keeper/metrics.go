@@ -1,8 +1,8 @@
 package keeper
 
 import (
-	wasmvmtypes "github.com/CosmWasm/wasmvm/v2/types"
 	"github.com/prometheus/client_golang/prometheus"
+	wasmvmtypes "wasm.mleku.dev/types"
 )
 
 const (
@@ -36,13 +36,17 @@ func NewWasmVMMetricsCollector(s metricSource) *WasmVMMetricsCollector {
 		panic("wasmvm instance must not be nil")
 	}
 	return &WasmVMMetricsCollector{
-		source:             s,
-		CacheHitsDescr:     prometheus.NewDesc("wasmvm_cache_hits_total", "Total number of cache hits", []string{"type"}, nil),
-		CacheMissesDescr:   prometheus.NewDesc("wasmvm_cache_misses_total", "Total number of cache misses", nil, nil),
-		CacheElementsDescr: prometheus.NewDesc("wasmvm_cache_elements_total", "Total number of elements in the cache", []string{"type"}, nil),
-		CacheSizeDescr:     prometheus.NewDesc("wasmvm_cache_size_bytes", "Total number of elements in the cache", []string{"type"}, nil),
-		PinnedHitsDescr:    prometheus.NewDesc("wasmvm_pinned_contract_hits", "Number of hits of a pinned contract", []string{"checksum"}, nil),
-		PinnedSizeDescr:    prometheus.NewDesc("wasmvm_pinned_contract_size", "Size of a pinned contract", []string{"checksum"}, nil),
+		source:           s,
+		CacheHitsDescr:   prometheus.NewDesc("wasmvm_cache_hits_total", "Total number of cache hits", []string{"type"}, nil),
+		CacheMissesDescr: prometheus.NewDesc("wasmvm_cache_misses_total", "Total number of cache misses", nil, nil),
+		CacheElementsDescr: prometheus.NewDesc("wasmvm_cache_elements_total", "Total number of elements in the cache",
+			[]string{"type"}, nil),
+		CacheSizeDescr: prometheus.NewDesc("wasmvm_cache_size_bytes", "Total number of elements in the cache",
+			[]string{"type"}, nil),
+		PinnedHitsDescr: prometheus.NewDesc("wasmvm_pinned_contract_hits", "Number of hits of a pinned contract",
+			[]string{"checksum"}, nil),
+		PinnedSizeDescr: prometheus.NewDesc("wasmvm_pinned_contract_size", "Size of a pinned contract", []string{"checksum"},
+			nil),
 	}
 }
 
@@ -63,21 +67,27 @@ func (p *WasmVMMetricsCollector) Describe(descs chan<- *prometheus.Desc) {
 func (p *WasmVMMetricsCollector) Collect(c chan<- prometheus.Metric) {
 	m, err := p.source.GetMetrics()
 	if err == nil {
-		c <- prometheus.MustNewConstMetric(p.CacheHitsDescr, prometheus.CounterValue, float64(m.HitsPinnedMemoryCache), labelPinned)
+		c <- prometheus.MustNewConstMetric(p.CacheHitsDescr, prometheus.CounterValue, float64(m.HitsPinnedMemoryCache),
+			labelPinned)
 		c <- prometheus.MustNewConstMetric(p.CacheHitsDescr, prometheus.CounterValue, float64(m.HitsMemoryCache), labelMemory)
 		c <- prometheus.MustNewConstMetric(p.CacheHitsDescr, prometheus.CounterValue, float64(m.HitsFsCache), labelFs)
 		c <- prometheus.MustNewConstMetric(p.CacheMissesDescr, prometheus.CounterValue, float64(m.Misses))
-		c <- prometheus.MustNewConstMetric(p.CacheElementsDescr, prometheus.GaugeValue, float64(m.ElementsPinnedMemoryCache), labelPinned)
-		c <- prometheus.MustNewConstMetric(p.CacheElementsDescr, prometheus.GaugeValue, float64(m.ElementsMemoryCache), labelMemory)
+		c <- prometheus.MustNewConstMetric(p.CacheElementsDescr, prometheus.GaugeValue, float64(m.ElementsPinnedMemoryCache),
+			labelPinned)
+		c <- prometheus.MustNewConstMetric(p.CacheElementsDescr, prometheus.GaugeValue, float64(m.ElementsMemoryCache),
+			labelMemory)
 		c <- prometheus.MustNewConstMetric(p.CacheSizeDescr, prometheus.GaugeValue, float64(m.SizeMemoryCache), labelMemory)
-		c <- prometheus.MustNewConstMetric(p.CacheSizeDescr, prometheus.GaugeValue, float64(m.SizePinnedMemoryCache), labelPinned)
+		c <- prometheus.MustNewConstMetric(p.CacheSizeDescr, prometheus.GaugeValue, float64(m.SizePinnedMemoryCache),
+			labelPinned)
 	}
 
 	pm, err := p.source.GetPinnedMetrics()
 	if err == nil {
 		for _, mod := range pm.PerModule {
-			c <- prometheus.MustNewConstMetric(p.PinnedHitsDescr, prometheus.CounterValue, float64(mod.Metrics.Hits), mod.Checksum.String())
-			c <- prometheus.MustNewConstMetric(p.PinnedSizeDescr, prometheus.GaugeValue, float64(mod.Metrics.Size), mod.Checksum.String())
+			c <- prometheus.MustNewConstMetric(p.PinnedHitsDescr, prometheus.CounterValue, float64(mod.Metrics.Hits),
+				mod.Checksum.String())
+			c <- prometheus.MustNewConstMetric(p.PinnedSizeDescr, prometheus.GaugeValue, float64(mod.Metrics.Size),
+				mod.Checksum.String())
 		}
 	}
 

@@ -22,8 +22,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/address"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
-	"github.com/CosmWasm/wasmd/app"
-	wasmibctesting "github.com/CosmWasm/wasmd/tests/ibctesting"
+	"wasmd.mleku.dev/app"
+	wasmibctesting "wasmd.mleku.dev/tests/ibctesting"
 )
 
 func TestICA(t *testing.T) {
@@ -69,7 +69,8 @@ func TestICA(t *testing.T) {
 			icaControllerAddr := sdk.AccAddress(icaControllerKey.PubKey().Address().Bytes())
 			controllerChain.Fund(icaControllerAddr, sdkmath.NewInt(1_000))
 
-			msg := icacontrollertypes.NewMsgRegisterInterchainAccount(path.EndpointA.ConnectionID, icaControllerAddr.String(), spec.icaVersion)
+			msg := icacontrollertypes.NewMsgRegisterInterchainAccount(path.EndpointA.ConnectionID, icaControllerAddr.String(),
+				spec.icaVersion)
 			res, err := controllerChain.SendNonDefaultSenderMsgs(icaControllerKey, msg)
 			require.NoError(t, err)
 			chanID, portID, version := parseIBCChannelEvents(t, res)
@@ -91,10 +92,11 @@ func TestICA(t *testing.T) {
 
 			// assert ICA exists on controller
 			contApp := controllerChain.App.(*app.WasmApp)
-			icaRsp, err := contApp.ICAControllerKeeper.InterchainAccount(controllerChain.GetContext(), &icacontrollertypes.QueryInterchainAccountRequest{
-				Owner:        icaControllerAddr.String(),
-				ConnectionId: path.EndpointA.ConnectionID,
-			})
+			icaRsp, err := contApp.ICAControllerKeeper.InterchainAccount(controllerChain.GetContext(),
+				&icacontrollertypes.QueryInterchainAccountRequest{
+					Owner:        icaControllerAddr.String(),
+					ConnectionId: path.EndpointA.ConnectionID,
+				})
 			require.NoError(t, err)
 			icaAddr := sdk.MustAccAddressFromBech32(icaRsp.GetAddress())
 			hostChain.Fund(icaAddr, sdkmath.NewInt(1_000))
@@ -111,7 +113,8 @@ func TestICA(t *testing.T) {
 				Memo: "testing",
 			}
 			relativeTimeout := uint64(time.Minute.Nanoseconds()) // note this is in nanoseconds
-			msgSendTx := icacontrollertypes.NewMsgSendTx(icaControllerAddr.String(), path.EndpointA.ConnectionID, relativeTimeout, payloadPacket)
+			msgSendTx := icacontrollertypes.NewMsgSendTx(icaControllerAddr.String(), path.EndpointA.ConnectionID,
+				relativeTimeout, payloadPacket)
 			_, err = controllerChain.SendNonDefaultSenderMsgs(icaControllerKey, msgSendTx)
 			require.NoError(t, err)
 

@@ -10,7 +10,7 @@ import (
 	ibctesting "github.com/cosmos/ibc-go/v8/testing"
 	"github.com/stretchr/testify/require"
 
-	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
+	wasmkeeper "wasmd.mleku.dev/x/wasm/keeper"
 )
 
 var (
@@ -254,7 +254,8 @@ func (coord *Coordinator) RelayAndAckPendingPackets(path *Path) error {
 	// get all the packet to relay src->dest
 	src := path.EndpointA
 	require.NoError(coord.t, src.UpdateClient())
-	coord.t.Logf("Relay: %d Packets A->B, %d Packets B->A\n", len(src.Chain.PendingSendPackets), len(path.EndpointB.Chain.PendingSendPackets))
+	coord.t.Logf("Relay: %d Packets A->B, %d Packets B->A\n", len(src.Chain.PendingSendPackets),
+		len(path.EndpointB.Chain.PendingSendPackets))
 	for _, v := range src.Chain.PendingSendPackets {
 		err := path.RelayPacket(v, nil)
 		if err != nil {
@@ -292,7 +293,8 @@ func (coord *Coordinator) TimeoutPendingPackets(path *Path) error {
 		// get proof of packet unreceived on dest
 		packetKey := host.PacketReceiptKey(packet.GetDestPort(), packet.GetDestChannel(), packet.GetSequence())
 		proofUnreceived, proofHeight := dest.QueryProof(packetKey)
-		timeoutMsg := channeltypes.NewMsgTimeout(packet, packet.Sequence, proofUnreceived, proofHeight, src.Chain.SenderAccount.GetAddress().String())
+		timeoutMsg := channeltypes.NewMsgTimeout(packet, packet.Sequence, proofUnreceived, proofHeight,
+			src.Chain.SenderAccount.GetAddress().String())
 		err := src.Chain.sendMsgs(timeoutMsg)
 		if err != nil {
 			return err

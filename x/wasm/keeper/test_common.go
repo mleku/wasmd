@@ -77,9 +77,9 @@ import (
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	"github.com/CosmWasm/wasmd/x/wasm/keeper/testdata"
-	"github.com/CosmWasm/wasmd/x/wasm/keeper/wasmtesting"
-	"github.com/CosmWasm/wasmd/x/wasm/types"
+	"wasmd.mleku.dev/x/wasm/keeper/testdata"
+	"wasmd.mleku.dev/x/wasm/keeper/wasmtesting"
+	"wasmd.mleku.dev/x/wasm/types"
 )
 
 var moduleBasics = module.NewBasicManager(
@@ -149,7 +149,8 @@ type TestFaucet struct {
 	minterModuleName string
 }
 
-func NewTestFaucet(t testing.TB, ctx sdk.Context, bankKeeper bankkeeper.Keeper, minterModuleName string, initialAmount ...sdk.Coin) *TestFaucet {
+func NewTestFaucet(t testing.TB, ctx sdk.Context, bankKeeper bankkeeper.Keeper, minterModuleName string,
+	initialAmount ...sdk.Coin) *TestFaucet {
 	require.NotEmpty(t, initialAmount)
 	r := &TestFaucet{t: t, bankKeeper: bankKeeper, minterModuleName: minterModuleName}
 	_, addr := keyPubAddr()
@@ -431,12 +432,14 @@ func createTestInput(
 	am := module.NewManager( // minimal module set that we use for message/ query tests
 		bank.NewAppModule(appCodec, bankKeeper, accountKeeper, subspace(banktypes.ModuleName)),
 		staking.NewAppModule(appCodec, stakingKeeper, accountKeeper, bankKeeper, subspace(stakingtypes.ModuleName)),
-		distribution.NewAppModule(appCodec, distKeeper, accountKeeper, bankKeeper, stakingKeeper, subspace(distributiontypes.ModuleName)),
+		distribution.NewAppModule(appCodec, distKeeper, accountKeeper, bankKeeper, stakingKeeper,
+			subspace(distributiontypes.ModuleName)),
 		gov.NewAppModule(appCodec, govKeeper, accountKeeper, bankKeeper, subspace(govtypes.ModuleName)),
 	)
 	am.RegisterServices(module.NewConfigurator(appCodec, msgRouter, querier)) //nolint:errcheck
 	types.RegisterMsgServer(msgRouter, NewMsgServerImpl(&keeper))
-	types.RegisterQueryServer(querier, NewGrpcQuerier(appCodec, runtime.NewKVStoreService(keys[types.ModuleName]), keeper, keeper.queryGasLimit))
+	types.RegisterQueryServer(querier,
+		NewGrpcQuerier(appCodec, runtime.NewKVStoreService(keys[types.ModuleName]), keeper, keeper.queryGasLimit))
 
 	keepers := TestKeepers{
 		AccountKeeper:    accountKeeper,
@@ -605,10 +608,12 @@ type ExampleContractInstance struct {
 }
 
 // SeedNewContractInstance sets the mock WasmEngine in keeper and calls store + instantiate to init the contract's metadata
-func SeedNewContractInstance(t testing.TB, ctx sdk.Context, keepers TestKeepers, mock types.WasmEngine) ExampleContractInstance {
+func SeedNewContractInstance(t testing.TB, ctx sdk.Context, keepers TestKeepers,
+	mock types.WasmEngine) ExampleContractInstance {
 	t.Helper()
 	exampleContract := StoreRandomContract(t, ctx, keepers, mock)
-	contractAddr, _, err := keepers.ContractKeeper.Instantiate(ctx, exampleContract.CodeID, exampleContract.CreatorAddr, exampleContract.CreatorAddr, []byte(`{}`), "", nil)
+	contractAddr, _, err := keepers.ContractKeeper.Instantiate(ctx, exampleContract.CodeID, exampleContract.CreatorAddr,
+		exampleContract.CreatorAddr, []byte(`{}`), "", nil)
 	require.NoError(t, err)
 	return ExampleContractInstance{
 		ExampleContract: exampleContract,
@@ -635,7 +640,8 @@ func StoreRandomContractWithAccessConfig(
 	wasmCode := append(wasmIdent, rand.Bytes(10)...)
 	codeID, checksum, err := keepers.ContractKeeper.Create(ctx, creatorAddr, wasmCode, cfg)
 	require.NoError(t, err)
-	exampleContract := ExampleContract{InitialAmount: anyAmount, Creator: creator, CreatorAddr: creatorAddr, CodeID: codeID, Checksum: checksum}
+	exampleContract := ExampleContract{InitialAmount: anyAmount, Creator: creator, CreatorAddr: creatorAddr, CodeID: codeID,
+		Checksum: checksum}
 	return exampleContract
 }
 
@@ -667,7 +673,8 @@ func InstantiateHackatomExampleContract(t testing.TB, ctx sdk.Context, keepers T
 
 	adminAddr := contract.CreatorAddr
 	label := "hackatom contract"
-	contractAddr, _, err := keepers.ContractKeeper.Instantiate(ctx, contract.CodeID, contract.CreatorAddr, adminAddr, initMsgBz, label, initialAmount)
+	contractAddr, _, err := keepers.ContractKeeper.Instantiate(ctx, contract.CodeID, contract.CreatorAddr, adminAddr, initMsgBz,
+		label, initialAmount)
 	require.NoError(t, err)
 	return HackatomExampleInstance{
 		ExampleContract: contract,
@@ -693,7 +700,8 @@ func InstantiateReflectExampleContract(t testing.TB, ctx sdk.Context, keepers Te
 	example := StoreReflectContract(t, ctx, keepers)
 	initialAmount := sdk.NewCoins(sdk.NewInt64Coin("denom", 100))
 	label := "reflect contract"
-	contractAddr, _, err := keepers.ContractKeeper.Instantiate(ctx, example.CodeID, example.CreatorAddr, example.CreatorAddr, []byte("{}"), label, initialAmount)
+	contractAddr, _, err := keepers.ContractKeeper.Instantiate(ctx, example.CodeID, example.CreatorAddr, example.CreatorAddr,
+		[]byte("{}"), label, initialAmount)
 
 	require.NoError(t, err)
 	return ExampleInstance{
@@ -705,11 +713,13 @@ func InstantiateReflectExampleContract(t testing.TB, ctx sdk.Context, keepers Te
 }
 
 // InstantiateReflectExampleContractWithPortID load and instantiate the "./testdata/reflect_2_0.wasm" contract with defined port ID
-func InstantiateReflectExampleContractWithPortID(t testing.TB, ctx sdk.Context, keepers TestKeepers, portID string) ExampleInstance {
+func InstantiateReflectExampleContractWithPortID(t testing.TB, ctx sdk.Context, keepers TestKeepers,
+	portID string) ExampleInstance {
 	example := StoreReflectContract(t, ctx, keepers)
 	initialAmount := sdk.NewCoins(sdk.NewInt64Coin("denom", 100))
 	label := "reflect contract with port id"
-	contractAddr, _, err := keepers.ContractKeeper.Instantiate(ctx, example.CodeID, example.CreatorAddr, example.CreatorAddr, []byte("{}"), label, initialAmount)
+	contractAddr, _, err := keepers.ContractKeeper.Instantiate(ctx, example.CodeID, example.CreatorAddr, example.CreatorAddr,
+		[]byte("{}"), label, initialAmount)
 
 	require.NoError(t, err)
 
@@ -760,7 +770,8 @@ func InstantiateIBCReflectContract(t testing.TB, ctx sdk.Context, keepers TestKe
 	require.NoError(t, err)
 	adminAddr := RandomAccountAddress(t)
 
-	contractAddr, _, err := keepers.ContractKeeper.Instantiate(ctx, ibcReflectID, adminAddr, adminAddr, initMsgBz, "ibc-reflect-factory", nil)
+	contractAddr, _, err := keepers.ContractKeeper.Instantiate(ctx, ibcReflectID, adminAddr, adminAddr, initMsgBz,
+		"ibc-reflect-factory", nil)
 	require.NoError(t, err)
 	return IBCReflectExampleInstance{
 		Admin:         adminAddr,
@@ -791,7 +802,8 @@ func (m BurnerExampleInitMsg) GetBytes(t testing.TB) []byte {
 	return initMsgBz
 }
 
-func fundAccounts(t testing.TB, ctx sdk.Context, am authkeeper.AccountKeeper, bank bankkeeper.Keeper, addr sdk.AccAddress, coins sdk.Coins) {
+func fundAccounts(t testing.TB, ctx sdk.Context, am authkeeper.AccountKeeper, bank bankkeeper.Keeper, addr sdk.AccAddress,
+	coins sdk.Coins) {
 	acc := am.NewAccountWithAddress(ctx, addr)
 	am.SetAccount(ctx, acc)
 	NewTestFaucet(t, ctx, bank, minttypes.ModuleName, coins...).Fund(ctx, addr, coins...)
