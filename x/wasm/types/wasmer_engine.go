@@ -1,8 +1,8 @@
 package types
 
 import (
-	wasmvm "github.com/CosmWasm/wasmvm/v2"
-	wasmvmtypes "github.com/CosmWasm/wasmvm/v2/types"
+	wasmvm "wasmvm.mleku.dev"
+	wasmvmtypes "wasmvm.mleku.dev/types"
 
 	storetypes "cosmossdk.io/store/types"
 )

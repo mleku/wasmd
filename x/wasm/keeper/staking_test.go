@@ -5,9 +5,9 @@ import (
 	"os"
 	"testing"
 
-	wasmvmtypes "github.com/CosmWasm/wasmvm/v2/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	wasmvmtypes "wasmvm.mleku.dev/types"
 
 	sdkmath "cosmossdk.io/math"
 

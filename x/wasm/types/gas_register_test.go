@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	wasmvmtypes "github.com/CosmWasm/wasmvm/v2/types"
 	"github.com/stretchr/testify/assert"
+	wasmvmtypes "wasmvm.mleku.dev/types"
 
 	storetypes "cosmossdk.io/store/types"
 )
@@ -114,7 +114,8 @@ func TestReplyCost(t *testing.T) {
 				Result: wasmvmtypes.SubMsgResult{
 					Ok: &wasmvmtypes.SubMsgResponse{
 						Events: []wasmvmtypes.Event{
-							{Type: "foo", Attributes: []wasmvmtypes.EventAttribute{{Key: strings.Repeat("x", DefaultEventAttributeDataFreeTier), Value: "myData"}}},
+							{Type: "foo", Attributes: []wasmvmtypes.EventAttribute{{Key: strings.Repeat("x",
+								DefaultEventAttributeDataFreeTier), Value: "myData"}}},
 						},
 					},
 				},
@@ -165,7 +166,8 @@ func TestReplyCost(t *testing.T) {
 				Result: wasmvmtypes.SubMsgResult{
 					Ok: &wasmvmtypes.SubMsgResponse{
 						Events: []wasmvmtypes.Event{
-							{Type: "foo", Attributes: []wasmvmtypes.EventAttribute{{Key: strings.Repeat("x", DefaultEventAttributeDataFreeTier), Value: "myData"}}},
+							{Type: "foo", Attributes: []wasmvmtypes.EventAttribute{{Key: strings.Repeat("x",
+								DefaultEventAttributeDataFreeTier), Value: "myData"}}},
 						},
 					},
 				},

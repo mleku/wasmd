@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"testing"
 
-	wasmvmtypes "github.com/CosmWasm/wasmvm/v2/types"
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cosmos/gogoproto/proto"
 	"github.com/stretchr/testify/require"
+	wasmvmtypes "wasmvm.mleku.dev/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 

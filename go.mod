@@ -3,7 +3,6 @@ module wasmd.mleku.dev
 go 1.21
 
 require (
-	github.com/CosmWasm/wasmvm/v2 v2.1.2
 	github.com/cosmos/cosmos-proto v1.0.0-beta.5
 	github.com/cosmos/cosmos-sdk v0.50.10
 	github.com/cosmos/gogogateway v1.2.0 // indirect
@@ -25,6 +24,7 @@ require (
 	google.golang.org/genproto v0.0.0-20240227224415-6ceb2ff114de // indirect
 	google.golang.org/grpc v1.64.1
 	gopkg.in/yaml.v2 v2.4.0
+	wasmvm.mleku.dev v1.0.0
 )
 
 require (

@@ -3,8 +3,8 @@ package keeper
 import (
 	"errors"
 
-	wasmvm "github.com/CosmWasm/wasmvm/v2"
-	wasmvmtypes "github.com/CosmWasm/wasmvm/v2/types"
+	wasmvm "wasmvm.mleku.dev"
+	wasmvmtypes "wasmvm.mleku.dev/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 

@@ -7,11 +7,11 @@ import (
 	"runtime/debug"
 	"strings"
 
-	wasmvm "github.com/CosmWasm/wasmvm/v2"
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
+	wasmvm "wasmvm.mleku.dev"
 
 	"cosmossdk.io/core/appmodule"
 
@@ -283,7 +283,7 @@ func getExpectedLibwasmVersion() string {
 		panic("can't read build info")
 	}
 	for _, d := range buildInfo.Deps {
-		if d.Path != "github.com/CosmWasm/wasmvm/v2" {
+		if d.Path != "wasmvm.mleku.dev" {
 			continue
 		}
 		if d.Replace != nil {

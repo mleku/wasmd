@@ -5,8 +5,8 @@ import (
 	"context"
 	"strings"
 
-	wasmvm "github.com/CosmWasm/wasmvm/v2"
 	"github.com/cosmos/gogoproto/proto"
+	wasmvm "wasmvm.mleku.dev"
 
 	errorsmod "cosmossdk.io/errors"
 

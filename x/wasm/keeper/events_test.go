@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	wasmvmtypes "github.com/CosmWasm/wasmvm/v2/types"
 	"github.com/stretchr/testify/assert"
+	wasmvmtypes "wasmvm.mleku.dev/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 

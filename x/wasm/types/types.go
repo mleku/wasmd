@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"reflect"
 
-	wasmvmtypes "github.com/CosmWasm/wasmvm/v2/types"
 	"github.com/cosmos/gogoproto/proto"
+	wasmvmtypes "wasmvm.mleku.dev/types"
 
 	errorsmod "cosmossdk.io/errors"
 
@@ -55,7 +55,8 @@ func NewCodeInfo(codeHash []byte, creator sdk.AccAddress, instantiatePermission 
 	}
 }
 
-var AllCodeHistoryTypes = []ContractCodeHistoryOperationType{ContractCodeHistoryOperationTypeGenesis, ContractCodeHistoryOperationTypeInit, ContractCodeHistoryOperationTypeMigrate}
+var AllCodeHistoryTypes = []ContractCodeHistoryOperationType{ContractCodeHistoryOperationTypeGenesis,
+	ContractCodeHistoryOperationTypeInit, ContractCodeHistoryOperationTypeMigrate}
 
 // NewContractInfo creates a new instance of a given WASM contract info
 func NewContractInfo(codeID uint64, creator, admin sdk.AccAddress, label string, createdAt *AbsoluteTxPosition) ContractInfo {
@@ -149,7 +150,8 @@ func (c *ContractInfo) ReadExtension(e ContractInfoExtension) error {
 	cached := c.Extension.GetCachedValue()
 	elem := reflect.ValueOf(cached).Elem()
 	if !elem.Type().AssignableTo(rv.Elem().Type()) {
-		return errorsmod.Wrapf(sdkerrors.ErrInvalidType, "extension is of type %s but argument of %s", elem.Type(), rv.Elem().Type())
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidType, "extension is of type %s but argument of %s", elem.Type(),
+			rv.Elem().Type())
 	}
 	rv.Elem().Set(elem)
 	return nil
@@ -398,7 +400,8 @@ func (a AccessConfig) IsSubset(superSet AccessConfig) bool {
 	switch superSet.Permission {
 	case AccessTypeAnyOfAddresses:
 		// An exact match or nobody
-		return a.Permission == AccessTypeNobody || a.Permission == AccessTypeAnyOfAddresses && isSubset(superSet.Addresses, a.Addresses)
+		return a.Permission == AccessTypeNobody || a.Permission == AccessTypeAnyOfAddresses && isSubset(superSet.Addresses,
+			a.Addresses)
 	case AccessTypeUnspecified:
 		return false
 	default:
