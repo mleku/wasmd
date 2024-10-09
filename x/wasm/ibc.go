@@ -15,8 +15,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/CosmWasm/wasmd/x/wasm/keeper"
-	"github.com/CosmWasm/wasmd/x/wasm/types"
+	"wasmd.mleku.dev/x/wasm/keeper"
+	"wasmd.mleku.dev/x/wasm/types"
 )
 
 // DefaultMaxIBCCallbackGas is the default value of maximum gas that an IBC callback can use.
@@ -261,11 +261,12 @@ func (i IBCHandler) OnChanCloseConfirm(ctx sdk.Context, portID, channelID string
 
 func toWasmVMChannel(portID, channelID string, channelInfo channeltypes.Channel, appVersion string) wasmvmtypes.IBCChannel {
 	return wasmvmtypes.IBCChannel{
-		Endpoint:             wasmvmtypes.IBCEndpoint{PortID: portID, ChannelID: channelID},
-		CounterpartyEndpoint: wasmvmtypes.IBCEndpoint{PortID: channelInfo.Counterparty.PortId, ChannelID: channelInfo.Counterparty.ChannelId},
-		Order:                channelInfo.Ordering.String(),
-		Version:              appVersion,
-		ConnectionID:         channelInfo.ConnectionHops[0], // At the moment this list must be of length 1. In the future multi-hop channels may be supported.
+		Endpoint: wasmvmtypes.IBCEndpoint{PortID: portID, ChannelID: channelID},
+		CounterpartyEndpoint: wasmvmtypes.IBCEndpoint{PortID: channelInfo.Counterparty.PortId,
+			ChannelID: channelInfo.Counterparty.ChannelId},
+		Order:        channelInfo.Ordering.String(),
+		Version:      appVersion,
+		ConnectionID: channelInfo.ConnectionHops[0], // At the moment this list must be of length 1. In the future multi-hop channels may be supported.
 	}
 }
 
@@ -450,7 +451,8 @@ func validateSender(contractAddr, senderAddr string) (sdk.AccAddress, error) {
 
 	// We only allow the contract that sent the message to receive source chain callbacks for it.
 	if !contractAddress.Equals(senderAddress) {
-		return nil, errorsmod.Wrapf(types.ErrExecuteFailed, "contract address %s does not match packet sender %s", contractAddr, senderAddress)
+		return nil, errorsmod.Wrapf(types.ErrExecuteFailed, "contract address %s does not match packet sender %s", contractAddr,
+			senderAddress)
 	}
 
 	return contractAddress, nil
@@ -485,7 +487,8 @@ func ValidateChannelParams(channelID string) error {
 		return err
 	}
 	if channelSequence > math.MaxUint32 {
-		return errorsmod.Wrapf(types.ErrMaxIBCChannels, "channel sequence %d is greater than max allowed transfer channels %d", channelSequence, math.MaxUint32)
+		return errorsmod.Wrapf(types.ErrMaxIBCChannels, "channel sequence %d is greater than max allowed transfer channels %d",
+			channelSequence, math.MaxUint32)
 	}
 	return nil
 }

@@ -15,9 +15,9 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/CosmWasm/wasmd/x/wasm/keeper/testdata"
-	"github.com/CosmWasm/wasmd/x/wasm/keeper/wasmtesting"
-	"github.com/CosmWasm/wasmd/x/wasm/types"
+	"wasmd.mleku.dev/x/wasm/keeper/testdata"
+	"wasmd.mleku.dev/x/wasm/keeper/wasmtesting"
+	"wasmd.mleku.dev/x/wasm/types"
 )
 
 func TestInstantiate2(t *testing.T) {

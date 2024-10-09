@@ -24,21 +24,23 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
-	"github.com/CosmWasm/wasmd/x/wasm/keeper/wasmtesting"
-	"github.com/CosmWasm/wasmd/x/wasm/types"
+	"wasmd.mleku.dev/x/wasm/keeper/wasmtesting"
+	"wasmd.mleku.dev/x/wasm/types"
 )
 
 func TestMessageHandlerChainDispatch(t *testing.T) {
 	capturingHandler, gotMsgs := wasmtesting.NewCapturingMessageHandler()
 
 	alwaysUnknownMsgHandler := &wasmtesting.MockMessageHandler{
-		DispatchMsgFn: func(ctx sdk.Context, contractAddr sdk.AccAddress, contractIBCPortID string, msg wasmvmtypes.CosmosMsg) (events []sdk.Event, data [][]byte, msgResponses [][]*codectypes.Any, err error) {
+		DispatchMsgFn: func(ctx sdk.Context, contractAddr sdk.AccAddress, contractIBCPortID string,
+			msg wasmvmtypes.CosmosMsg) (events []sdk.Event, data [][]byte, msgResponses [][]*codectypes.Any, err error) {
 			return nil, nil, [][]*codectypes.Any{}, types.ErrUnknownMsg
 		},
 	}
 
 	assertNotCalledHandler := &wasmtesting.MockMessageHandler{
-		DispatchMsgFn: func(ctx sdk.Context, contractAddr sdk.AccAddress, contractIBCPortID string, msg wasmvmtypes.CosmosMsg) (events []sdk.Event, data [][]byte, msgResponses [][]*codectypes.Any, err error) {
+		DispatchMsgFn: func(ctx sdk.Context, contractAddr sdk.AccAddress, contractIBCPortID string,
+			msg wasmvmtypes.CosmosMsg) (events []sdk.Event, data [][]byte, msgResponses [][]*codectypes.Any, err error) {
 			t.Fatal("not expected to be called")
 			return
 		},
@@ -61,7 +63,9 @@ func TestMessageHandlerChainDispatch(t *testing.T) {
 		},
 		"stops iteration on handler error": {
 			handlers: []Messenger{&wasmtesting.MockMessageHandler{
-				DispatchMsgFn: func(ctx sdk.Context, contractAddr sdk.AccAddress, contractIBCPortID string, msg wasmvmtypes.CosmosMsg) (events []sdk.Event, data [][]byte, msgResponses [][]*codectypes.Any, err error) {
+				DispatchMsgFn: func(ctx sdk.Context, contractAddr sdk.AccAddress, contractIBCPortID string,
+					msg wasmvmtypes.CosmosMsg) (events []sdk.Event, data [][]byte, msgResponses [][]*codectypes.Any,
+					err error) {
 					return nil, nil, [][]*codectypes.Any{}, types.ErrInvalidMsg
 				},
 			}, assertNotCalledHandler},
@@ -70,7 +74,9 @@ func TestMessageHandlerChainDispatch(t *testing.T) {
 		"return events when handle": {
 			handlers: []Messenger{
 				&wasmtesting.MockMessageHandler{
-					DispatchMsgFn: func(ctx sdk.Context, contractAddr sdk.AccAddress, contractIBCPortID string, msg wasmvmtypes.CosmosMsg) (events []sdk.Event, data [][]byte, msgResponses [][]*codectypes.Any, err error) {
+					DispatchMsgFn: func(ctx sdk.Context, contractAddr sdk.AccAddress, contractIBCPortID string,
+						msg wasmvmtypes.CosmosMsg) (events []sdk.Event, data [][]byte, msgResponses [][]*codectypes.Any,
+						err error) {
 						_, data, msgResponses, _ = capturingHandler.DispatchMsg(ctx, contractAddr, contractIBCPortID, msg)
 						return []sdk.Event{sdk.NewEvent("myEvent", sdk.NewAttribute("foo", "bar"))}, data, msgResponses, nil
 					},
@@ -89,7 +95,8 @@ func TestMessageHandlerChainDispatch(t *testing.T) {
 
 			// when
 			h := MessageHandlerChain{spec.handlers}
-			gotEvents, gotData, gotMsgResponses, gotErr := h.DispatchMsg(sdk.Context{}, RandomAccountAddress(t), "anyPort", myMsg)
+			gotEvents, gotData, gotMsgResponses, gotErr := h.DispatchMsg(sdk.Context{}, RandomAccountAddress(t), "anyPort",
+				myMsg)
 
 			// then
 			require.True(t, spec.expErr.Is(gotErr), "exp %v but got %#+v", spec.expErr, gotErr)
@@ -247,7 +254,8 @@ func TestIBCRawPacketHandler(t *testing.T) {
 	var capturedPacketAck *CapturedPacket
 
 	capturingICS4Mock := &wasmtesting.MockICS4Wrapper{
-		SendPacketFn: func(ctx sdk.Context, channelCap *capabilitytypes.Capability, sourcePort, sourceChannel string, timeoutHeight clienttypes.Height, timeoutTimestamp uint64, data []byte) (uint64, error) {
+		SendPacketFn: func(ctx sdk.Context, channelCap *capabilitytypes.Capability, sourcePort, sourceChannel string,
+			timeoutHeight clienttypes.Height, timeoutTimestamp uint64, data []byte) (uint64, error) {
 			capturedPacketSent = &CapturedPacket{
 				sourcePort:       sourcePort,
 				sourceChannel:    sourceChannel,
@@ -257,7 +265,8 @@ func TestIBCRawPacketHandler(t *testing.T) {
 			}
 			return 1, nil
 		},
-		WriteAcknowledgementFn: func(ctx sdk.Context, chanCap *capabilitytypes.Capability, packet ibcexported.PacketI, acknowledgement ibcexported.Acknowledgement) error {
+		WriteAcknowledgementFn: func(ctx sdk.Context, chanCap *capabilitytypes.Capability, packet ibcexported.PacketI,
+			acknowledgement ibcexported.Acknowledgement) error {
 			capturedPacketAck = &CapturedPacket{
 				sourcePort:       packet.GetSourcePort(),
 				sourceChannel:    packet.GetSourceChannel(),
@@ -374,7 +383,8 @@ func TestIBCRawPacketHandler(t *testing.T) {
 
 			// when
 			h := NewIBCRawPacketHandler(capturingICS4Mock, &contractKeeper, spec.chanKeeper, spec.capKeeper)
-			evts, data, msgResponses, gotErr := h.DispatchMsg(ctx, RandomAccountAddress(t), ibcPort, wasmvmtypes.CosmosMsg{IBC: &spec.srcMsg}) //nolint:gosec
+			evts, data, msgResponses, gotErr := h.DispatchMsg(ctx, RandomAccountAddress(t), ibcPort,
+				wasmvmtypes.CosmosMsg{IBC: &spec.srcMsg}) //nolint:gosec
 
 			// then
 			require.True(t, spec.expErr.Is(gotErr), "exp %v but got %#+v", spec.expErr, gotErr)
@@ -457,11 +467,15 @@ func TestBurnCoinMessageHandlerIntegration(t *testing.T) {
 	for name, spec := range specs {
 		t.Run(name, func(t *testing.T) {
 			ctx, _ = parentCtx.CacheContext()
-			k.wasmVM = &wasmtesting.MockWasmEngine{ExecuteFn: func(codeID wasmvm.Checksum, env wasmvmtypes.Env, info wasmvmtypes.MessageInfo, executeMsg []byte, store wasmvm.KVStore, goapi wasmvm.GoAPI, querier wasmvm.Querier, gasMeter wasmvm.GasMeter, gasLimit uint64, deserCost wasmvmtypes.UFraction) (*wasmvmtypes.ContractResult, uint64, error) {
+			k.wasmVM = &wasmtesting.MockWasmEngine{ExecuteFn: func(codeID wasmvm.Checksum, env wasmvmtypes.Env,
+				info wasmvmtypes.MessageInfo, executeMsg []byte, store wasmvm.KVStore, goapi wasmvm.GoAPI,
+				querier wasmvm.Querier, gasMeter wasmvm.GasMeter, gasLimit uint64,
+				deserCost wasmvmtypes.UFraction) (*wasmvmtypes.ContractResult, uint64, error) {
 				return &wasmvmtypes.ContractResult{
 					Ok: &wasmvmtypes.Response{
 						Messages: []wasmvmtypes.SubMsg{
-							{Msg: wasmvmtypes.CosmosMsg{Bank: &wasmvmtypes.BankMsg{Burn: &spec.msg}}, ReplyOn: wasmvmtypes.ReplyNever}, //nolint:gosec
+							{Msg: wasmvmtypes.CosmosMsg{Bank: &wasmvmtypes.BankMsg{Burn: &spec.msg}},
+								ReplyOn: wasmvmtypes.ReplyNever}, //nolint:gosec
 						},
 					},
 				}, 0, nil

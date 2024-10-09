@@ -1,7 +1,7 @@
 package app
 
 import (
-	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
+	wasmkeeper "wasmd.mleku.dev/x/wasm/keeper"
 )
 
 // Deprecated: Use BuiltInCapabilities from github.com/CosmWasm/wasmd/x/wasm/keeper

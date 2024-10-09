@@ -13,9 +13,9 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/CosmWasm/wasmd/tests/ibctesting"
-	"github.com/CosmWasm/wasmd/x/wasm/keeper/testdata"
-	"github.com/CosmWasm/wasmd/x/wasm/types"
+	"wasmd.mleku.dev/tests/ibctesting"
+	"wasmd.mleku.dev/x/wasm/keeper/testdata"
+	"wasmd.mleku.dev/x/wasm/types"
 )
 
 // InstantiateStargateReflectContract stores and instantiates the reflect contract shipped with CosmWasm 1.5.3.
@@ -36,7 +36,8 @@ func InstantiateReflectContract(t *testing.T, chain *ibctesting.TestChain) sdk.A
 }
 
 // MustExecViaReflectContract submit execute message to send payload to reflect contract
-func MustExecViaReflectContract(t *testing.T, chain *ibctesting.TestChain, contractAddr sdk.AccAddress, msgs ...wasmvmtypes.CosmosMsg) *abci.ExecTxResult {
+func MustExecViaReflectContract(t *testing.T, chain *ibctesting.TestChain, contractAddr sdk.AccAddress,
+	msgs ...wasmvmtypes.CosmosMsg) *abci.ExecTxResult {
 	rsp, err := ExecViaReflectContract(t, chain, contractAddr, msgs)
 	require.NoError(t, err)
 	return rsp
@@ -47,7 +48,8 @@ type sdkMessageType interface {
 	sdk.Msg
 }
 
-func MustExecViaStargateReflectContract[T sdkMessageType](t *testing.T, chain *ibctesting.TestChain, contractAddr sdk.AccAddress, msgs ...T) *abci.ExecTxResult {
+func MustExecViaStargateReflectContract[T sdkMessageType](t *testing.T, chain *ibctesting.TestChain,
+	contractAddr sdk.AccAddress, msgs ...T) *abci.ExecTxResult {
 	require.NotEmpty(t, msgs)
 	// convert messages to stargate variant
 	vmMsgs := make([]string, len(msgs))
@@ -55,7 +57,8 @@ func MustExecViaStargateReflectContract[T sdkMessageType](t *testing.T, chain *i
 		bz, err := chain.Codec.Marshal(m)
 		require.NoError(t, err)
 		// json is built manually because the wasmvm CosmosMsg does not have the `Stargate` variant anymore
-		vmMsgs[i] = fmt.Sprintf("{\"stargate\":{\"type_url\":\"%s\",\"value\":\"%s\"}}", sdk.MsgTypeURL(m), base64.StdEncoding.EncodeToString(bz))
+		vmMsgs[i] = fmt.Sprintf("{\"stargate\":{\"type_url\":\"%s\",\"value\":\"%s\"}}", sdk.MsgTypeURL(m),
+			base64.StdEncoding.EncodeToString(bz))
 	}
 	// build the complete reflect message
 	reflectSendBz := []byte(fmt.Sprintf("{\"reflect_msg\":{\"msgs\":%s}}", vmMsgs))
@@ -70,7 +73,8 @@ func MustExecViaStargateReflectContract[T sdkMessageType](t *testing.T, chain *i
 	return rsp
 }
 
-func MustExecViaAnyReflectContract[T sdkMessageType](t *testing.T, chain *ibctesting.TestChain, contractAddr sdk.AccAddress, msgs ...T) *abci.ExecTxResult {
+func MustExecViaAnyReflectContract[T sdkMessageType](t *testing.T, chain *ibctesting.TestChain, contractAddr sdk.AccAddress,
+	msgs ...T) *abci.ExecTxResult {
 	vmMsgs := make([]wasmvmtypes.CosmosMsg, len(msgs))
 	for i, m := range msgs {
 		bz, err := chain.Codec.Marshal(m)
@@ -88,7 +92,8 @@ func MustExecViaAnyReflectContract[T sdkMessageType](t *testing.T, chain *ibctes
 }
 
 // ExecViaReflectContract submit execute message to send payload to reflect contract
-func ExecViaReflectContract(t *testing.T, chain *ibctesting.TestChain, contractAddr sdk.AccAddress, msgs []wasmvmtypes.CosmosMsg) (*abci.ExecTxResult, error) {
+func ExecViaReflectContract(t *testing.T, chain *ibctesting.TestChain, contractAddr sdk.AccAddress,
+	msgs []wasmvmtypes.CosmosMsg) (*abci.ExecTxResult, error) {
 	require.NotEmpty(t, msgs)
 	reflectSend := testdata.ReflectHandleMsg{
 		Reflect: &testdata.ReflectPayload{Msgs: msgs},

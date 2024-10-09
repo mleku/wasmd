@@ -10,7 +10,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/CosmWasm/wasmd/x/wasm/types"
+	"wasmd.mleku.dev/x/wasm/types"
 )
 
 // newWasmModuleEvent creates with wasm module event for interacting with the given contract. Adds custom attributes
@@ -45,7 +45,8 @@ func newCustomEvents(evts wasmvmtypes.Array[wasmvmtypes.Event], contractAddr sdk
 }
 
 // convert and add contract address issuing this event
-func contractSDKEventAttributes(customAttributes []wasmvmtypes.EventAttribute, contractAddr sdk.AccAddress) ([]sdk.Attribute, error) {
+func contractSDKEventAttributes(customAttributes []wasmvmtypes.EventAttribute, contractAddr sdk.AccAddress) ([]sdk.Attribute,
+	error) {
 	attrs := []sdk.Attribute{sdk.NewAttribute(types.AttributeKeyContractAddr, contractAddr.String())}
 	// append attributes from wasm to the sdk.Event
 	for _, l := range customAttributes {
@@ -57,7 +58,8 @@ func contractSDKEventAttributes(customAttributes []wasmvmtypes.EventAttribute, c
 		value := strings.TrimSpace(l.Value)
 		// and reserve all _* keys for our use (not contract)
 		if strings.HasPrefix(key, types.AttributeReservedPrefix) {
-			return nil, errorsmod.Wrap(types.ErrInvalidEvent, fmt.Sprintf("Attribute key starts with reserved prefix %s: '%s'", types.AttributeReservedPrefix, key))
+			return nil, errorsmod.Wrap(types.ErrInvalidEvent,
+				fmt.Sprintf("Attribute key starts with reserved prefix %s: '%s'", types.AttributeReservedPrefix, key))
 		}
 		attrs = append(attrs, sdk.NewAttribute(key, value))
 	}

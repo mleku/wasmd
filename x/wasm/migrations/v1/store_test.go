@@ -10,8 +10,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/address"
 
-	"github.com/CosmWasm/wasmd/x/wasm/keeper"
-	"github.com/CosmWasm/wasmd/x/wasm/types"
+	"wasmd.mleku.dev/x/wasm/keeper"
+	"wasmd.mleku.dev/x/wasm/types"
 )
 
 func TestMigrate1To2(t *testing.T) {
@@ -34,17 +34,20 @@ func TestMigrate1To2(t *testing.T) {
 	em := sdk.NewEventManager()
 
 	// create with no balance is also legal
-	gotContractAddr1, _, err := keepers.ContractKeeper.Instantiate(ctx.WithEventManager(em), example.CodeID, creator, nil, initMsgBz, "demo contract 1", nil)
+	gotContractAddr1, _, err := keepers.ContractKeeper.Instantiate(ctx.WithEventManager(em), example.CodeID, creator, nil,
+		initMsgBz, "demo contract 1", nil)
 	require.NoError(t, err)
 	ctx = ctx.WithBlockHeight(ctx.BlockHeight() + 1)
 
 	// create with no balance is also legal
-	gotContractAddr2, _, err := keepers.ContractKeeper.Instantiate(ctx.WithEventManager(em), example.CodeID, creator, nil, initMsgBz, "demo contract 1", nil)
+	gotContractAddr2, _, err := keepers.ContractKeeper.Instantiate(ctx.WithEventManager(em), example.CodeID, creator, nil,
+		initMsgBz, "demo contract 1", nil)
 	require.NoError(t, err)
 	ctx = ctx.WithBlockHeight(ctx.BlockHeight() + 1)
 
 	// create with no balance is also legal
-	gotContractAddr3, _, err := keepers.ContractKeeper.Instantiate(ctx.WithEventManager(em), example.CodeID, creator, nil, initMsgBz, "demo contract 1", nil)
+	gotContractAddr3, _, err := keepers.ContractKeeper.Instantiate(ctx.WithEventManager(em), example.CodeID, creator, nil,
+		initMsgBz, "demo contract 1", nil)
 	require.NoError(t, err)
 
 	info1 := wasmKeeper.GetContractInfo(ctx, gotContractAddr1)
@@ -52,9 +55,12 @@ func TestMigrate1To2(t *testing.T) {
 	info3 := wasmKeeper.GetContractInfo(ctx, gotContractAddr3)
 
 	// remove key
-	ctx.KVStore(keepers.WasmStoreKey).Delete(types.GetContractByCreatorSecondaryIndexKey(creator, info1.Created.Bytes(), gotContractAddr1))
-	ctx.KVStore(keepers.WasmStoreKey).Delete(types.GetContractByCreatorSecondaryIndexKey(creator, info2.Created.Bytes(), gotContractAddr2))
-	ctx.KVStore(keepers.WasmStoreKey).Delete(types.GetContractByCreatorSecondaryIndexKey(creator, info3.Created.Bytes(), gotContractAddr3))
+	ctx.KVStore(keepers.WasmStoreKey).Delete(types.GetContractByCreatorSecondaryIndexKey(creator, info1.Created.Bytes(),
+		gotContractAddr1))
+	ctx.KVStore(keepers.WasmStoreKey).Delete(types.GetContractByCreatorSecondaryIndexKey(creator, info2.Created.Bytes(),
+		gotContractAddr2))
+	ctx.KVStore(keepers.WasmStoreKey).Delete(types.GetContractByCreatorSecondaryIndexKey(creator, info3.Created.Bytes(),
+		gotContractAddr3))
 
 	// migrator
 	err = keeper.NewMigrator(*wasmKeeper, nil).Migrate1to2(ctx)

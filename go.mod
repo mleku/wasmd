@@ -1,4 +1,4 @@
-module github.com/CosmWasm/wasmd
+module wasmd.mleku.dev
 
 go 1.21
 

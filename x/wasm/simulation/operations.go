@@ -18,9 +18,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/tx"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 
-	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
-	"github.com/CosmWasm/wasmd/x/wasm/keeper/testdata"
-	"github.com/CosmWasm/wasmd/x/wasm/types"
+	wasmkeeper "wasmd.mleku.dev/x/wasm/keeper"
+	"wasmd.mleku.dev/x/wasm/keeper/testdata"
+	"wasmd.mleku.dev/x/wasm/types"
 )
 
 // Simulation operation weights constants
@@ -159,7 +159,8 @@ type (
 	MsgMigrateCodeIDSelector   func(sdk.Context, WasmKeeper, uint64) uint64
 )
 
-func DefaultSimulationMigrateContractSelector(ctx sdk.Context, wasmKeeper WasmKeeper, adminAddress string) (sdk.AccAddress, types.ContractInfo) {
+func DefaultSimulationMigrateContractSelector(ctx sdk.Context, wasmKeeper WasmKeeper, adminAddress string) (sdk.AccAddress,
+	types.ContractInfo) {
 	var contractAddress sdk.AccAddress
 	var contractInfo types.ContractInfo
 	wasmKeeper.IterateContractInfo(ctx, func(address sdk.AccAddress, info types.ContractInfo) bool {
@@ -202,12 +203,14 @@ func SimulateMsgMigrateContract(
 		simAccount, _ := simtypes.RandomAcc(r, accs)
 		ctAddress, info := contractSelector(ctx, wasmKeeper, simAccount.Address.String())
 		if ctAddress == nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.MsgMigrateContract{}.Type(), "no contract instance available"), nil, nil
+			return simtypes.NoOpMsg(types.ModuleName, types.MsgMigrateContract{}.Type(),
+				"no contract instance available"), nil, nil
 		}
 
 		codeID := codeIDSelector(ctx, wasmKeeper, info.CodeID)
 		if codeID == 0 {
-			return simtypes.NoOpMsg(types.ModuleName, types.MsgMigrateContract{}.Type(), "no target contract available"), nil, nil
+			return simtypes.NoOpMsg(types.ModuleName, types.MsgMigrateContract{}.Type(),
+				"no target contract available"), nil, nil
 		}
 		migrateMsg := types.MsgMigrateContract{
 			Sender:   simAccount.Address.String(),
@@ -266,7 +269,8 @@ func SimulateMsgClearAdmin(
 type MsgUpdateAdminContractSelector func(sdk.Context, WasmKeeper, string) (sdk.AccAddress, types.ContractInfo)
 
 // DefaultSimulationUpdateAdminContractSelector picks the first contract which Admin != ""
-func DefaultSimulationUpdateAdminContractSelector(ctx sdk.Context, wasmKeeper WasmKeeper, adminAddress string) (sdk.AccAddress, types.ContractInfo) {
+func DefaultSimulationUpdateAdminContractSelector(ctx sdk.Context, wasmKeeper WasmKeeper, adminAddress string) (sdk.AccAddress,
+	types.ContractInfo) {
 	var contractAddress sdk.AccAddress
 	var contractInfo types.ContractInfo
 	wasmKeeper.IterateContractInfo(ctx, func(address sdk.AccAddress, info types.ContractInfo) bool {
@@ -301,7 +305,8 @@ func SimulateMsgUpdateAmin(
 
 		newAdmin, _ := simtypes.RandomAcc(r, accs)
 		if newAdmin.Address.String() == simAccount.Address.String() {
-			return simtypes.NoOpMsg(types.ModuleName, types.MsgUpdateAdmin{}.Type(), "new admin cannot be the same as current admin"), nil, nil
+			return simtypes.NoOpMsg(types.ModuleName, types.MsgUpdateAdmin{}.Type(),
+				"new admin cannot be the same as current admin"), nil, nil
 		}
 
 		msg := types.MsgUpdateAdmin{
@@ -381,7 +386,8 @@ func SimulateMsgInstantiateContract(
 
 		codeID := codeSelector(ctx, wasmKeeper)
 		if codeID == 0 {
-			return simtypes.NoOpMsg(types.ModuleName, types.MsgInstantiateContract{}.Type(), "no codes with permission available"), nil, nil
+			return simtypes.NoOpMsg(types.ModuleName, types.MsgInstantiateContract{}.Type(),
+				"no codes with permission available"), nil, nil
 		}
 		deposit := sdk.Coins{}
 		spendableCoins := bk.SpendableCoins(ctx, simAccount.Address)
@@ -413,7 +419,8 @@ type MsgExecuteContractSelector = func(ctx sdk.Context, wasmKeeper WasmKeeper) s
 type MsgExecutePayloader func(msg *types.MsgExecuteContract) error
 
 // MsgExecuteSenderSelector extension point that returns the sender address
-type MsgExecuteSenderSelector func(wasmKeeper WasmKeeper, ctx sdk.Context, contractAddr sdk.AccAddress, accs []simtypes.Account) (simtypes.Account, error)
+type MsgExecuteSenderSelector func(wasmKeeper WasmKeeper, ctx sdk.Context, contractAddr sdk.AccAddress,
+	accs []simtypes.Account) (simtypes.Account, error)
 
 // SimulateMsgExecuteContract create a execute message a reflect contract instance
 func SimulateMsgExecuteContract(
@@ -433,7 +440,8 @@ func SimulateMsgExecuteContract(
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 		contractAddr := contractSelector(ctx, wasmKeeper)
 		if contractAddr == nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.MsgExecuteContract{}.Type(), "no contract instance available"), nil, nil
+			return simtypes.NoOpMsg(types.ModuleName, types.MsgExecuteContract{}.Type(),
+				"no contract instance available"), nil, nil
 		}
 		simAccount, err := senderSelector(wasmKeeper, ctx, contractAddr, accs)
 		if err != nil {
@@ -506,7 +514,8 @@ func DefaultSimulationExecuteContractSelector(ctx sdk.Context, wasmKeeper WasmKe
 }
 
 // DefaultSimulationExecuteSenderSelector queries reflect contract for owner address and selects accounts
-func DefaultSimulationExecuteSenderSelector(wasmKeeper WasmKeeper, ctx sdk.Context, contractAddr sdk.AccAddress, accs []simtypes.Account) (simtypes.Account, error) {
+func DefaultSimulationExecuteSenderSelector(wasmKeeper WasmKeeper, ctx sdk.Context, contractAddr sdk.AccAddress,
+	accs []simtypes.Account) (simtypes.Account, error) {
 	var none simtypes.Account
 	bz, err := json.Marshal(testdata.ReflectQueryMsg{Owner: &struct{}{}})
 	if err != nil {

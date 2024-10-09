@@ -20,8 +20,8 @@ import (
 	govv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	"github.com/CosmWasm/wasmd/x/wasm/keeper/wasmtesting"
-	"github.com/CosmWasm/wasmd/x/wasm/types"
+	"wasmd.mleku.dev/x/wasm/keeper/wasmtesting"
+	"wasmd.mleku.dev/x/wasm/types"
 )
 
 func TestEncoding(t *testing.T) {
@@ -538,7 +538,8 @@ func TestEncodeIbcMsg(t *testing.T) {
 							Denom:  "ALX",
 							Amount: "1",
 						},
-						Timeout: wasmvmtypes.IBCTimeout{Timestamp: 100, Block: &wasmvmtypes.IBCTimeoutBlock{Height: 1, Revision: 2}},
+						Timeout: wasmvmtypes.IBCTimeout{Timestamp: 100,
+							Block: &wasmvmtypes.IBCTimeoutBlock{Height: 1, Revision: 2}},
 					},
 				},
 			},

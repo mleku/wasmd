@@ -15,9 +15,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/address"
 
-	"github.com/CosmWasm/wasmd/x/wasm/keeper"
-	"github.com/CosmWasm/wasmd/x/wasm/keeper/wasmtesting"
-	"github.com/CosmWasm/wasmd/x/wasm/types"
+	"wasmd.mleku.dev/x/wasm/keeper"
+	"wasmd.mleku.dev/x/wasm/keeper/wasmtesting"
+	"wasmd.mleku.dev/x/wasm/types"
 )
 
 func TestOnRecvPacket(t *testing.T) {
@@ -103,7 +103,8 @@ func TestOnRecvPacket(t *testing.T) {
 	for name, spec := range specs {
 		t.Run(name, func(t *testing.T) {
 			mock := wasmtesting.IBCContractKeeperMock{
-				OnRecvPacketFn: func(ctx sdk.Context, contractAddr sdk.AccAddress, msg wasmvmtypes.IBCPacketReceiveMsg) (ibcexported.Acknowledgement, error) {
+				OnRecvPacketFn: func(ctx sdk.Context, contractAddr sdk.AccAddress,
+					msg wasmvmtypes.IBCPacketReceiveMsg) (ibcexported.Acknowledgement, error) {
 					// additional custom event to confirm event handling on state commit/ rollback
 					ctx.EventManager().EmitEvent(myCustomEvent)
 					return spec.contractRsp, spec.contractOkMsgExecErr

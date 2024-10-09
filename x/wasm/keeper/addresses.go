@@ -8,7 +8,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/address"
 
-	"github.com/CosmWasm/wasmd/x/wasm/types"
+	"wasmd.mleku.dev/x/wasm/types"
 )
 
 // AddressGenerator abstract address generator to be used for a single contract address
@@ -46,7 +46,8 @@ func BuildContractAddressClassic(codeID, instanceID uint64) sdk.AccAddress {
 // (len(checksum) | checksum | len(sender_address) | sender_address | len(salt) | salt| len(initMsg) | initMsg).
 //
 // All method parameter values must be valid and not nil.
-func BuildContractAddressPredictable(checksum []byte, creator sdk.AccAddress, salt, initMsg types.RawContractMessage) sdk.AccAddress {
+func BuildContractAddressPredictable(checksum []byte, creator sdk.AccAddress,
+	salt, initMsg types.RawContractMessage) sdk.AccAddress {
 	if len(checksum) != 32 {
 		panic("invalid checksum")
 	}

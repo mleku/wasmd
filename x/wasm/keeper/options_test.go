@@ -18,8 +18,8 @@ import (
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 
-	"github.com/CosmWasm/wasmd/x/wasm/keeper/wasmtesting"
-	"github.com/CosmWasm/wasmd/x/wasm/types"
+	"wasmd.mleku.dev/x/wasm/keeper/wasmtesting"
+	"wasmd.mleku.dev/x/wasm/types"
 )
 
 func TestConstructorOptions(t *testing.T) {
@@ -123,7 +123,8 @@ func TestConstructorOptions(t *testing.T) {
 			},
 		},
 		"accepted account types": {
-			srcOpt: WithAcceptedAccountTypesOnContractInstantiation(&authtypes.BaseAccount{}, &vestingtypes.ContinuousVestingAccount{}),
+			srcOpt: WithAcceptedAccountTypesOnContractInstantiation(&authtypes.BaseAccount{},
+				&vestingtypes.ContinuousVestingAccount{}),
 			verify: func(t *testing.T, k Keeper) {
 				exp := map[reflect.Type]struct{}{
 					reflect.TypeOf(&authtypes.BaseAccount{}):                 {},
@@ -155,7 +156,9 @@ func TestConstructorOptions(t *testing.T) {
 			opt := spec.srcOpt
 			_, gotPostOptMarker := opt.(postOptsFn)
 			require.Equal(t, spec.isPostOpt, gotPostOptMarker)
-			k := NewKeeper(codec, runtime.NewKVStoreService(storeKey), authkeeper.AccountKeeper{}, &bankkeeper.BaseKeeper{}, stakingkeeper.Keeper{}, nil, nil, nil, nil, nil, nil, nil, nil, tempDir, types.DefaultWasmConfig(), AvailableCapabilities, "", spec.srcOpt)
+			k := NewKeeper(codec, runtime.NewKVStoreService(storeKey), authkeeper.AccountKeeper{}, &bankkeeper.BaseKeeper{},
+				stakingkeeper.Keeper{}, nil, nil, nil, nil, nil, nil, nil, nil, tempDir, types.DefaultWasmConfig(),
+				AvailableCapabilities, "", spec.srcOpt)
 			spec.verify(t, k)
 		})
 	}

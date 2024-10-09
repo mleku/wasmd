@@ -9,8 +9,8 @@ import (
 
 	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 
-	"github.com/CosmWasm/wasmd/app/params"
-	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
+	"wasmd.mleku.dev/app/params"
+	wasmkeeper "wasmd.mleku.dev/x/wasm/keeper"
 )
 
 // MakeEncodingConfig creates a new EncodingConfig with all modules registered. For testing only
@@ -18,7 +18,8 @@ func MakeEncodingConfig(t testing.TB) params.EncodingConfig {
 	t.Helper()
 	// we "pre"-instantiate the application for getting the injected/configured encoding configuration
 	// note, this is not necessary when using app wiring, as depinject can be directly used (see root_v2.go)
-	tempApp := NewWasmApp(log.NewNopLogger(), dbm.NewMemDB(), nil, true, simtestutil.NewAppOptionsWithFlagHome(t.TempDir()), []wasmkeeper.Option{})
+	tempApp := NewWasmApp(log.NewNopLogger(), dbm.NewMemDB(), nil, true, simtestutil.NewAppOptionsWithFlagHome(t.TempDir()),
+		[]wasmkeeper.Option{})
 	return makeEncodingConfig(tempApp)
 }
 

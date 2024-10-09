@@ -18,9 +18,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"github.com/CosmWasm/wasmd/x/wasm/keeper/testdata"
-	"github.com/CosmWasm/wasmd/x/wasm/keeper/wasmtesting"
-	"github.com/CosmWasm/wasmd/x/wasm/types"
+	"wasmd.mleku.dev/x/wasm/keeper/testdata"
+	"wasmd.mleku.dev/x/wasm/keeper/wasmtesting"
+	"wasmd.mleku.dev/x/wasm/types"
 )
 
 // test handing of submessages, very closely related to the reflect_test
@@ -43,7 +43,8 @@ func TestDispatchSubMsgSuccessCase(t *testing.T) {
 	require.Equal(t, uint64(1), codeID)
 
 	// creator instantiates a contract and gives it tokens
-	contractAddr, _, err := keepers.ContractKeeper.Instantiate(ctx, codeID, creator, nil, []byte("{}"), "reflect contract 1", contractStart)
+	contractAddr, _, err := keepers.ContractKeeper.Instantiate(ctx, codeID, creator, nil, []byte("{}"), "reflect contract 1",
+		contractStart)
 	require.NoError(t, err)
 	require.NotEmpty(t, contractAddr)
 
@@ -136,7 +137,8 @@ func TestDispatchSubMsgErrorHandling(t *testing.T) {
 	}
 	initMsgBz, err := json.Marshal(initMsg)
 	require.NoError(t, err)
-	hackatomAddr, _, err := keepers.ContractKeeper.Instantiate(ctx, hackatomID, uploader, nil, initMsgBz, "hackatom demo", contractStart)
+	hackatomAddr, _, err := keepers.ContractKeeper.Instantiate(ctx, hackatomID, uploader, nil, initMsgBz, "hackatom demo",
+		contractStart)
 	require.NoError(t, err)
 
 	validBankSend := func(contract, emptyAccount string) wasmvmtypes.CosmosMsg {
@@ -212,7 +214,8 @@ func TestDispatchSubMsgErrorHandling(t *testing.T) {
 		}
 	}
 
-	assertGotContractAddr := func(t *testing.T, ctx sdk.Context, contract, emptyAccount string, response wasmvmtypes.SubMsgResult) {
+	assertGotContractAddr := func(t *testing.T, ctx sdk.Context, contract, emptyAccount string,
+		response wasmvmtypes.SubMsgResult) {
 		// should get the events emitted on new contract
 		event := response.Ok.Events[0]
 		require.Equal(t, event.Type, "instantiate")
@@ -279,7 +282,8 @@ func TestDispatchSubMsgErrorHandling(t *testing.T) {
 			subMsgError: true,
 			gasLimit:    &subGasLimit,
 			// uses all the subGasLimit, plus the 52k or so for the main contract
-			resultAssertions: []assertion{assertGasUsed(subGasLimit+75_000, subGasLimit+77_000), assertErrorString("codespace: sdk, code: 11")},
+			resultAssertions: []assertion{assertGasUsed(subGasLimit+75_000, subGasLimit+77_000),
+				assertErrorString("codespace: sdk, code: 11")},
 		},
 		"instantiate contract gets address in data and events": {
 			submsgID:         21,
@@ -292,7 +296,8 @@ func TestDispatchSubMsgErrorHandling(t *testing.T) {
 			creator := keepers.Faucet.NewFundedRandomAccount(ctx, contractStart...)
 			_, empty := keyPubAddr()
 
-			contractAddr, _, err := keepers.ContractKeeper.Instantiate(ctx, reflectID, creator, nil, []byte("{}"), fmt.Sprintf("contract %s", name), contractStart)
+			contractAddr, _, err := keepers.ContractKeeper.Instantiate(ctx, reflectID, creator, nil, []byte("{}"),
+				fmt.Sprintf("contract %s", name), contractStart)
 			require.NoError(t, err)
 
 			msg := tc.msg(contractAddr.String(), empty.String())
@@ -367,7 +372,8 @@ func TestDispatchSubMsgEncodeToNoSdkMsg(t *testing.T) {
 		Bank: nilEncoder,
 	}
 
-	ctx, keepers := CreateTestInput(t, false, ReflectCapabilities, WithMessageHandler(NewSDKMessageHandler(MakeTestCodec(t), nil, customEncoders)))
+	ctx, keepers := CreateTestInput(t, false, ReflectCapabilities,
+		WithMessageHandler(NewSDKMessageHandler(MakeTestCodec(t), nil, customEncoders)))
 	keeper := keepers.WasmKeeper
 
 	deposit := sdk.NewCoins(sdk.NewInt64Coin("denom", 100000))
@@ -381,7 +387,8 @@ func TestDispatchSubMsgEncodeToNoSdkMsg(t *testing.T) {
 	require.NoError(t, err)
 
 	// creator instantiates a contract and gives it tokens
-	contractAddr, _, err := keepers.ContractKeeper.Instantiate(ctx, codeID, creator, nil, []byte("{}"), "reflect contract 1", contractStart)
+	contractAddr, _, err := keepers.ContractKeeper.Instantiate(ctx, codeID, creator, nil, []byte("{}"), "reflect contract 1",
+		contractStart)
 	require.NoError(t, err)
 	require.NotEmpty(t, contractAddr)
 
@@ -447,7 +454,8 @@ func TestDispatchSubMsgConditionalReplyOn(t *testing.T) {
 	require.NoError(t, err)
 
 	// creator instantiates a contract and gives it tokens
-	contractAddr, _, err := keepers.ContractKeeper.Instantiate(ctx, codeID, creator, nil, []byte("{}"), "reflect contract 1", contractStart)
+	contractAddr, _, err := keepers.ContractKeeper.Instantiate(ctx, codeID, creator, nil, []byte("{}"), "reflect contract 1",
+		contractStart)
 	require.NoError(t, err)
 
 	goodSend := wasmvmtypes.CosmosMsg{
@@ -563,7 +571,9 @@ func TestInstantiateGovSubMsgAuthzPropagated(t *testing.T) {
 	wasmtesting.MakeInstantiable(mockWasmVM)
 	var instanceLevel int
 	// mock wasvm to return new instantiate msgs with the response
-	mockWasmVM.InstantiateFn = func(codeID wasmvm.Checksum, env wasmvmtypes.Env, info wasmvmtypes.MessageInfo, initMsg []byte, store wasmvm.KVStore, goapi wasmvm.GoAPI, querier wasmvm.Querier, gasMeter wasmvm.GasMeter, gasLimit uint64, deserCost wasmvmtypes.UFraction) (*wasmvmtypes.ContractResult, uint64, error) {
+	mockWasmVM.InstantiateFn = func(codeID wasmvm.Checksum, env wasmvmtypes.Env, info wasmvmtypes.MessageInfo, initMsg []byte,
+		store wasmvm.KVStore, goapi wasmvm.GoAPI, querier wasmvm.Querier, gasMeter wasmvm.GasMeter, gasLimit uint64,
+		deserCost wasmvmtypes.UFraction) (*wasmvmtypes.ContractResult, uint64, error) {
 		if instanceLevel == 2 {
 			return &wasmvmtypes.ContractResult{Ok: &wasmvmtypes.Response{}}, 0, nil
 		}
@@ -624,7 +634,8 @@ func TestInstantiateGovSubMsgAuthzPropagated(t *testing.T) {
 			tCtx, _ := ctx.CacheContext()
 			instanceLevel = 0
 
-			_, _, gotErr := k.instantiate(tCtx, example1.CodeID, example1.CreatorAddr, nil, []byte(`{"first":{}}`), "from ext msg", nil, k.ClassicAddressGenerator(), spec.policy)
+			_, _, gotErr := k.instantiate(tCtx, example1.CodeID, example1.CreatorAddr, nil, []byte(`{"first":{}}`),
+				"from ext msg", nil, k.ClassicAddressGenerator(), spec.policy)
 			if spec.expErr != nil {
 				assert.ErrorIs(t, gotErr, spec.expErr)
 				return
@@ -652,7 +663,9 @@ func TestMigrateGovSubMsgAuthzPropagated(t *testing.T) {
 
 	var instanceLevel int
 	// mock wasvm to return new migrate msgs with the response
-	mockWasmVM.MigrateFn = func(codeID wasmvm.Checksum, env wasmvmtypes.Env, migrateMsg []byte, store wasmvm.KVStore, goapi wasmvm.GoAPI, querier wasmvm.Querier, gasMeter wasmvm.GasMeter, gasLimit uint64, deserCost wasmvmtypes.UFraction) (*wasmvmtypes.ContractResult, uint64, error) {
+	mockWasmVM.MigrateFn = func(codeID wasmvm.Checksum, env wasmvmtypes.Env, migrateMsg []byte, store wasmvm.KVStore,
+		goapi wasmvm.GoAPI, querier wasmvm.Querier, gasMeter wasmvm.GasMeter, gasLimit uint64,
+		deserCost wasmvmtypes.UFraction) (*wasmvmtypes.ContractResult, uint64, error) {
 		if instanceLevel == 1 {
 			return &wasmvmtypes.ContractResult{Ok: &wasmvmtypes.Response{}}, 0, nil
 		}

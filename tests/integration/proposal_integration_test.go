@@ -18,14 +18,16 @@ import (
 	v1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	"github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 
-	"github.com/CosmWasm/wasmd/x/wasm/keeper"
-	"github.com/CosmWasm/wasmd/x/wasm/keeper/testdata"
-	"github.com/CosmWasm/wasmd/x/wasm/types"
+	"wasmd.mleku.dev/x/wasm/keeper"
+	"wasmd.mleku.dev/x/wasm/keeper/testdata"
+	"wasmd.mleku.dev/x/wasm/types"
 )
 
 var (
-	CyberpunkCapabilities = []string{"staking", "mask", "stargate", "cosmwasm_1_1", "cosmwasm_1_2", "cosmwasm_1_3", "cosmwasm_1_4"}
-	ReflectCapabilities   = []string{"staking", "mask", "stargate", "cosmwasm_1_1", "cosmwasm_1_2", "cosmwasm_1_3", "cosmwasm_1_4", "cosmwasm_2_0"}
+	CyberpunkCapabilities = []string{"staking", "mask", "stargate", "cosmwasm_1_1", "cosmwasm_1_2", "cosmwasm_1_3",
+		"cosmwasm_1_4"}
+	ReflectCapabilities = []string{"staking", "mask", "stargate", "cosmwasm_1_1", "cosmwasm_1_2", "cosmwasm_1_3",
+		"cosmwasm_1_4", "cosmwasm_2_0"}
 )
 
 func TestLoadStoredGovV1Beta1LegacyTypes(t *testing.T) {
@@ -198,12 +200,14 @@ func TestLoadStoredGovV1Beta1LegacyTypes(t *testing.T) {
 	}
 }
 
-func mustSubmitAndExecuteLegacyProposal(t *testing.T, ctx sdk.Context, content v1beta1.Content, myActorAddress string, keepers keeper.TestKeepers) uint64 {
+func mustSubmitAndExecuteLegacyProposal(t *testing.T, ctx sdk.Context, content v1beta1.Content, myActorAddress string,
+	keepers keeper.TestKeepers) uint64 {
 	t.Helper()
 	govAuthority := keepers.AccountKeeper.GetModuleAddress(govtypes.ModuleName).String()
 	msgServer := govkeeper.NewMsgServerImpl(keepers.GovKeeper)
 	// ignore all submit events
-	contentMsg, rsp, err := submitLegacyProposal(t, ctx.WithEventManager(sdk.NewEventManager()), content, myActorAddress, govAuthority, msgServer)
+	contentMsg, rsp, err := submitLegacyProposal(t, ctx.WithEventManager(sdk.NewEventManager()), content, myActorAddress,
+		govAuthority, msgServer)
 	require.NoError(t, err)
 
 	_, err = msgServer.ExecLegacyContent(ctx, v1.NewMsgExecLegacyContent(contentMsg.Content, govAuthority))
@@ -212,7 +216,8 @@ func mustSubmitAndExecuteLegacyProposal(t *testing.T, ctx sdk.Context, content v
 }
 
 // does not fail on submit proposal
-func submitLegacyProposal(t *testing.T, ctx sdk.Context, content v1beta1.Content, myActorAddress, govAuthority string, msgServer v1.MsgServer) (*v1.MsgExecLegacyContent, *v1.MsgSubmitProposalResponse, error) {
+func submitLegacyProposal(t *testing.T, ctx sdk.Context, content v1beta1.Content, myActorAddress, govAuthority string,
+	msgServer v1.MsgServer) (*v1.MsgExecLegacyContent, *v1.MsgSubmitProposalResponse, error) {
 	t.Helper()
 	contentMsg, err := v1.NewLegacyContent(content, govAuthority)
 	require.NoError(t, err)

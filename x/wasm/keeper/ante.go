@@ -9,7 +9,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/CosmWasm/wasmd/x/wasm/types"
+	"wasmd.mleku.dev/x/wasm/types"
 )
 
 // CountTXDecorator ante handler to count the tx position in a block.
@@ -84,7 +84,8 @@ func NewLimitSimulationGasDecorator(gasLimit *storetypes.Gas) *LimitSimulationGa
 // simulations but may have effect on client user experience.
 //
 // When no custom value is set then the max block gas is used as default limit.
-func (d LimitSimulationGasDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
+func (d LimitSimulationGasDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context,
+	error) {
 	if !simulate {
 		// Wasm code is not executed in checkTX so that we don't need to limit it further.
 		// Tendermint rejects the TX afterwards when the tx.gas > max block gas.

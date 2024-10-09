@@ -49,7 +49,8 @@ func TestChainUpgrade(t *testing.T) {
 	t.Log("Launch hackatom contract")
 	codeID := cli.WasmStore("./testdata/hackatom.wasm.gzip")
 	initMsg := fmt.Sprintf(`{"verifier":%q, "beneficiary":%q}`, verifierAddr, beneficiary)
-	contractAddr := cli.WasmInstantiate(codeID, initMsg, "--admin="+defaultSrcAddr, "--label=label1", "--from="+defaultSrcAddr, "--amount=1000000stake")
+	contractAddr := cli.WasmInstantiate(codeID, initMsg, "--admin="+defaultSrcAddr, "--label=label1", "--from="+defaultSrcAddr,
+		"--amount=1000000stake")
 
 	gotRsp := cli.QuerySmart(contractAddr, `{"verifier":{}}`)
 	require.Equal(t, fmt.Sprintf(`{"data":{"verifier":"%s"}}`, verifierAddr), gotRsp)
@@ -117,7 +118,7 @@ func FetchExecutable(t *testing.T, version string) string {
 	t.Logf("+++ version not in cache, downloading from github")
 
 	// then download from GH releases: only works with Linux currently as we are not publishing OSX binaries
-	const releaseUrl = "https://github.com/CosmWasm/wasmd/releases/download/%s/wasmd-%s-linux-amd64.tar.gz"
+	const releaseUrl = "https://wasmd.mleku.dev/releases/download/%s/wasmd-%s-linux-amd64.tar.gz"
 	destDir := t.TempDir()
 	rsp, err := http.Get(fmt.Sprintf(releaseUrl, version, version))
 	require.NoError(t, err)

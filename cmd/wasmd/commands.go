@@ -34,11 +34,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 
-	"github.com/CosmWasm/wasmd/app"
-	"github.com/CosmWasm/wasmd/x/wasm"
-	wasmcli "github.com/CosmWasm/wasmd/x/wasm/client/cli"
-	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
-	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+	"wasmd.mleku.dev/app"
+	"wasmd.mleku.dev/x/wasm"
+	wasmcli "wasmd.mleku.dev/x/wasm/client/cli"
+	wasmkeeper "wasmd.mleku.dev/x/wasm/keeper"
+	wasmtypes "wasmd.mleku.dev/x/wasm/types"
 )
 
 // initCometBFTConfig helps to override default CometBFT Config values.

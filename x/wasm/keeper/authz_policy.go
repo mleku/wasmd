@@ -3,14 +3,15 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/CosmWasm/wasmd/x/wasm/types"
+	"wasmd.mleku.dev/x/wasm/types"
 )
 
 var _ types.AuthorizationPolicy = DefaultAuthorizationPolicy{}
 
 type DefaultAuthorizationPolicy struct{}
 
-func (p DefaultAuthorizationPolicy) CanCreateCode(chainConfigs types.ChainAccessConfigs, actor sdk.AccAddress, contractConfig types.AccessConfig) bool {
+func (p DefaultAuthorizationPolicy) CanCreateCode(chainConfigs types.ChainAccessConfigs, actor sdk.AccAddress,
+	contractConfig types.AccessConfig) bool {
 	return chainConfigs.Upload.Allowed(actor) &&
 		contractConfig.IsSubset(chainConfigs.Instantiate)
 }
@@ -92,11 +93,13 @@ type PartialGovAuthorizationPolicy struct {
 }
 
 // NewPartialGovAuthorizationPolicy constructor
-func NewPartialGovAuthorizationPolicy(defaultPolicy types.AuthorizationPolicy, entrypoint types.AuthorizationPolicyAction) PartialGovAuthorizationPolicy {
+func NewPartialGovAuthorizationPolicy(defaultPolicy types.AuthorizationPolicy,
+	entrypoint types.AuthorizationPolicyAction) PartialGovAuthorizationPolicy {
 	return PartialGovAuthorizationPolicy{action: entrypoint, defaultPolicy: defaultPolicy}
 }
 
-func (p PartialGovAuthorizationPolicy) CanCreateCode(chainConfigs types.ChainAccessConfigs, actor sdk.AccAddress, contractConfig types.AccessConfig) bool {
+func (p PartialGovAuthorizationPolicy) CanCreateCode(chainConfigs types.ChainAccessConfigs, actor sdk.AccAddress,
+	contractConfig types.AccessConfig) bool {
 	return p.defaultPolicy.CanCreateCode(chainConfigs, actor, contractConfig)
 }
 

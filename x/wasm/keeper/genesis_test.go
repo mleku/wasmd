@@ -32,7 +32,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 
-	"github.com/CosmWasm/wasmd/x/wasm/types"
+	"wasmd.mleku.dev/x/wasm/types"
 )
 
 func TestGenesisExportImport(t *testing.T) {
@@ -165,7 +165,8 @@ func TestGenesisExportImportWithPredictableAddress(t *testing.T) {
 	eCtx, _ := ctx.CacheContext()
 	codeID := StoreReflectContract(t, eCtx, keepers).CodeID
 	creator := RandomAccountAddress(t)
-	_, _, err := keepers.ContractKeeper.Instantiate2(eCtx, codeID, creator, nil, []byte("{}"), "testing", nil, []byte("my_salt"), false)
+	_, _, err := keepers.ContractKeeper.Instantiate2(eCtx, codeID, creator, nil, []byte("{}"), "testing", nil,
+		[]byte("my_salt"), false)
 	require.NoError(t, err)
 	genesisState := ExportGenesis(eCtx, k)
 	// when imported
@@ -288,7 +289,8 @@ func TestGenesisInit(t *testing.T) {
 				Contracts: []types.Contract{
 					{
 						ContractAddress: BuildContractAddressClassic(1, 1).String(),
-						ContractInfo:    types.ContractInfoFixture(func(c *types.ContractInfo) { c.CodeID = 1 }, types.RandCreatedFields),
+						ContractInfo: types.ContractInfoFixture(func(c *types.ContractInfo) { c.CodeID = 1 },
+							types.RandCreatedFields),
 						ContractCodeHistory: []types.ContractCodeHistoryEntry{
 							{
 								Operation: types.ContractCodeHistoryOperationTypeMigrate,
@@ -317,7 +319,8 @@ func TestGenesisInit(t *testing.T) {
 				Contracts: []types.Contract{
 					{
 						ContractAddress: BuildContractAddressClassic(1, 1).String(),
-						ContractInfo:    types.ContractInfoFixture(func(c *types.ContractInfo) { c.CodeID = 1 }, types.RandCreatedFields),
+						ContractInfo: types.ContractInfoFixture(func(c *types.ContractInfo) { c.CodeID = 1 },
+							types.RandCreatedFields),
 						ContractCodeHistory: []types.ContractCodeHistoryEntry{
 							{
 								Operation: types.ContractCodeHistoryOperationTypeMigrate,
@@ -328,7 +331,8 @@ func TestGenesisInit(t *testing.T) {
 						},
 					}, {
 						ContractAddress: BuildContractAddressClassic(1, 2).String(),
-						ContractInfo:    types.ContractInfoFixture(func(c *types.ContractInfo) { c.CodeID = 1 }, types.RandCreatedFields),
+						ContractInfo: types.ContractInfoFixture(func(c *types.ContractInfo) { c.CodeID = 1 },
+							types.RandCreatedFields),
 						ContractCodeHistory: []types.ContractCodeHistoryEntry{
 							{
 								Operation: types.ContractCodeHistoryOperationTypeMigrate,
@@ -352,7 +356,8 @@ func TestGenesisInit(t *testing.T) {
 				Contracts: []types.Contract{
 					{
 						ContractAddress: BuildContractAddressClassic(1, 1).String(),
-						ContractInfo:    types.ContractInfoFixture(func(c *types.ContractInfo) { c.CodeID = 1 }, types.RandCreatedFields),
+						ContractInfo: types.ContractInfoFixture(func(c *types.ContractInfo) { c.CodeID = 1 },
+							types.RandCreatedFields),
 						ContractCodeHistory: []types.ContractCodeHistoryEntry{
 							{
 								Operation: types.ContractCodeHistoryOperationTypeMigrate,
@@ -376,7 +381,8 @@ func TestGenesisInit(t *testing.T) {
 				Contracts: []types.Contract{
 					{
 						ContractAddress: BuildContractAddressClassic(1, 1).String(),
-						ContractInfo:    types.ContractInfoFixture(func(c *types.ContractInfo) { c.CodeID = 1 }, types.RandCreatedFields),
+						ContractInfo: types.ContractInfoFixture(func(c *types.ContractInfo) { c.CodeID = 1 },
+							types.RandCreatedFields),
 						ContractCodeHistory: []types.ContractCodeHistoryEntry{
 							{
 								Operation: types.ContractCodeHistoryOperationTypeMigrate,
@@ -387,7 +393,8 @@ func TestGenesisInit(t *testing.T) {
 						},
 					}, {
 						ContractAddress: BuildContractAddressClassic(1, 1).String(),
-						ContractInfo:    types.ContractInfoFixture(func(c *types.ContractInfo) { c.CodeID = 1 }, types.RandCreatedFields),
+						ContractInfo: types.ContractInfoFixture(func(c *types.ContractInfo) { c.CodeID = 1 },
+							types.RandCreatedFields),
 						ContractCodeHistory: []types.ContractCodeHistoryEntry{
 							{
 								Operation: types.ContractCodeHistoryOperationTypeMigrate,
@@ -411,7 +418,8 @@ func TestGenesisInit(t *testing.T) {
 				Contracts: []types.Contract{
 					{
 						ContractAddress: BuildContractAddressClassic(1, 1).String(),
-						ContractInfo:    types.ContractInfoFixture(func(c *types.ContractInfo) { c.CodeID = 1 }, types.RandCreatedFields),
+						ContractInfo: types.ContractInfoFixture(func(c *types.ContractInfo) { c.CodeID = 1 },
+							types.RandCreatedFields),
 						ContractState: []types.Model{
 							{
 								Key:   []byte{0x1},
@@ -467,7 +475,8 @@ func TestGenesisInit(t *testing.T) {
 				Contracts: []types.Contract{
 					{
 						ContractAddress: BuildContractAddressClassic(1, 1).String(),
-						ContractInfo:    types.ContractInfoFixture(func(c *types.ContractInfo) { c.CodeID = 1 }, types.RandCreatedFields),
+						ContractInfo: types.ContractInfoFixture(func(c *types.ContractInfo) { c.CodeID = 1 },
+							types.RandCreatedFields),
 						ContractCodeHistory: []types.ContractCodeHistoryEntry{
 							{
 								Operation: types.ContractCodeHistoryOperationTypeMigrate,
